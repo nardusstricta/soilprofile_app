@@ -1,0 +1,6 @@
+Profile,name,depth,skel_dim,skel_ab,polygon_shape,col,root_ab,root_dim,orientation,age,pH,Corg,C.N,IS,Feo,Fed,transition,buffer_size,buffer_number,nSides,rate,numberX,sd
+Braunerde,Ah,0-20,NA,NA,NA,7.5YR 2/1,many,0.2,h,60,NA,NA,NA,NA,NA,NA,galtt,0,0,0,0,0,0
+Braunerde,AhBv,20-30,NA,NA,NA,10YR 5/4,many,0.2,h,60,NA,NA,NA,NA,NA,NA,galtt,0,0,0,0,0,0
+Braunerde,Bv,30-60,4,0.05,6,5YR 2/1,many,0.2,h,60,5.9,26.58,20.2,NA,NA,NA,glatt,0,0,0,0,0,0
+Braunerde,C,60-100,5,.75,12,2.5Y 5/3,abundant,0.5,v,60,5.8,1.5,14.4,85,0.11,0.19,wellig,0,0,0,0,4,1
+Braunerde,CvFe,100-160,5,.75,12,2.5Y 5/3,abundant,0.5,v,60,5.8,1.5,14.4,85,0.11,0.19,wellig,0,0,0,0,4,1
