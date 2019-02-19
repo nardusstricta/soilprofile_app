@@ -1,0 +1,13 @@
+name: soilprofile_test2
+title: soilprofile_test2
+username:
+account: nardus
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 620291
+bundleId: 1772898
+url: https://nardus.shinyapps.io/soilprofile_test2/
+when: 1545215127.36982
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: braunerde.csv|inputx.R|NA|.RData|.Rprofile|slinder_test.R|test_modul.R|test.R
