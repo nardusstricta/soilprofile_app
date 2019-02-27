@@ -1,11 +1,12 @@
+#options(shiny.reactlog=TRUE)
+#shiny::runApp
 shinyServer(function(input, output, session){
 
 ##
 #data Import:####
 ##
 
-  datafile <- callModule(csvFile, "datafile",
-                         stringsAsFactors = FALSE) 
+  datafile <- callModule(csvFile, "datafile") 
   
   df_global1 <- reactive({
     data_mod(datafile())
@@ -18,19 +19,19 @@ shinyServer(function(input, output, session){
   #set coordinates:
 
   df_global2 <- reactive({
-    
-      cord_setting(df_global1(), plot_width = 3)
-
+      cord_setting(df_global1(), plot_width = input$plot_width)
   })
   
   df_global3 <- reactive({
     sf_polygon(df_geom = df_global2(), df_attri = df_global1())
   })
   
+  #set length of each Input Paramert (number of horizons)
   pvars <- reactive({
     nrow(df_global3())
   })
   
+  #set dafault values depending of the horizont dimension
   y_vals <- reactive({
     default_yval(df_global3())
   })
@@ -67,7 +68,7 @@ shinyServer(function(input, output, session){
   select_smooth <- callModule(selectMod, id = "sel_smoth", 
                               label = df_global3()$nameC[-1],
                               value = rep(FALSE, pvars()-1),
-                              name = "advanced settings",
+                              name = "horizon selection",
                               pvars = pvars()-1)
 
   sm_buffer_size <- callModule(sliderMod, id = "sm_buf_si",
@@ -132,8 +133,6 @@ shinyServer(function(input, output, session){
     line2 <- split_polygon(polygon = df_global3(),
                            line = line1)
     
-     #von 12 auf .1
-    
     if(any(unlist(select_smooth()))== TRUE){
       #Applying smooth trans  function
       smooth_profile <- smooth_trans(lmod = line1,
@@ -153,155 +152,118 @@ shinyServer(function(input, output, session){
     min = rep(0, pvars()),
     max = rep(1, pvars()),
     pvars = pvars(),
-    name = "number of Sides",
-    step = rep(.1, pvars()))
+    name = "color transparency",
+    step = rep(.1, pvars()),
+    sWH = FALSE)
   
   print_plot1 <- reactive({
-    
       geom_sf(data = shape_mod_print(),
               fill = shape_mod_print()$rgb_col, 
               alpha = alpha_bg()
-              )
+              ) 
   }) 
   
-  ##
-  #Raster Import:####
-  ##
-
-  
-
-
 
   
   ##
-  #Plot2#####
+  #Plot2 texture#####
   ##
   
-  # row_select_pat <- callModule(selectMod,
-  #                              id = "pattern",
-  #                              label = df_global3()$nameC,
-  #                              value = c(T,T,T,T),
-  #                              name = "pattern",
-  #                              pvars = pvars())
-  # 
-  # 
-  # 
-  # print_plot2 <- reactive({
-  #   shiny::req(input$buffer)
-  #   row_select_pat <- unlist(row_select_pat())
-  #   texture_sf <- apply_texture(shape = shape_mod_print()[row_select_pat,],
-  #                               buffer = input$buffer
-  #                               )
-  #   texture_sf <- par_default(texture_sf)
-  # 
-  #   data <- texture_sf %>%
-  #     group_by(nameC)
-  # 
-  # 
-  #     p <- geom_sf(data = data,
-  #                  fill = texture_sf$bgc,
-  #                  col = texture_sf$col,
-  #                  shape = texture_sf$pch,
-  #                  linetype = texture_sf$linetype)
-  #     return(p)
-  # })
+  print_plot2 <- callModule(outer_textur, "texture",
+                            df_global3 = shape_mod_print, 
+                            pvars = pvars
+                            )
   
   ##
-  #Plot3#####
+  #Plot3 rocks#####
   ##
   
-  # point_shape <- callModule(sliderMod,
-  #                           id = "point_shape",
-  #                           label = df_global3()$nameC,
-  #                           value = c(0,7,9,10), 
-  #                           min = c(0, 0, 0, 0),
-  #                           max = c(10, 10, 10, 10),
-  #                           pvars = pvars(), 
-  #                           name = "Pointshape", 
-  #                           step = rep(0.1, pvars()))
-  # 
-  # cellnumber <- callModule(sliderMod, 
-  #                          id = "cellnumber", 
-  #                          label = df_global3()$nameC,
-  #                          value = c(0,7,9,10), 
-  #                          min = c(0, 0, 0, 0),
-  #                          max = c(20, 20, 20, 20),
-  #                          pvars = pvars(), 
-  #                          name = "cellnumber", 
-  #                          step = rep(1, pvars())
-  # )
-  # 
-  # rotation <- callModule(sliderMod, 
-  #                          id = "rotation", 
-  #                          label = df_global3()$nameC,
-  #                          value = c(0,1,9,0), 
-  #                          min = c(0, 0, 0, 0),
-  #                          max = c(20, 20, 20, 20),
-  #                          pvars = pvars(), 
-  #                          name = "rotation", 
-  #                          step = rep(1, pvars())
-  # )
-  #                          
-  # spoint <- reactive({
-  #   mat_spoint <- data.frame(
-  #     name = c(1, 2, 3, 4),
-  #     nSides = point_shape(),
-  #     smooth = c(T, T, F, F),
-  #     union = c(T, T, T, T),
-  #     phi = c(0,.1,.5,0),
-  #     strat = c(F, T, T, T), 
-  #     cellnumber = cellnumber(),
-  #     rotation = rotation()
-  #   )
-  #   skeleton(shape_mod = df_global3(),
-  #            skeleton_mat = mat_spoint
-  #   )
-  #   
-  # })
-  # 
-  # 
-  # 
-  # row_select <- callModule(selectMod, 
-  #                          id = "rock",
-  #                          label = df_global3()$nameC,
-  #                          value = c(T,T,F,T),
-  #                          name = "Skeleton",
-  #                          pvars = pvars())
-  # 
-  # rock_col <- callModule(colMod, 
-  #                        id = "rock_col",
-  #                        label = df_global3()$nameC,
-  #                        value = rep("#505C50A8", pvars()),
-  #                        name = "Col",
-  #                        pvars = pvars())
-  # 
-  # 
-  # print_plot3 <- reactive({
-  #   row_select <- unlist(row_select())
-  #   geom_sf(data = spoint()[row_select,], fill = rock_col()[row_select])
-  # })
+  list_plot3 <- callModule(outer_rock,
+                            "rock", 
+                            df_global3 = df_global3, 
+                            pvars = pvars)
+  print_plot3 <- list_plot3[[1]]
   
+  ##
+  #Plot 4 roots ####
+  ##
+  
+  print_plot4 <- callModule(outer_root, 
+                            "root", 
+                            df_global3 = df_global3,
+                            pvars = pvars)
+  
+  ##
+  #Plot 5 structure####
+  ##
+  
+  print_plot5 <- callModule(textMod, 
+                          id = "stru_soil",
+                          label = df_global3()$nameC,
+                          choices = struc_poly$name,
+                          pvars = pvars(),
+                          name = "select structure", 
+                          global_df = shape_mod_print
+                          )
+  ##
+  #Plot 6 Photo import
+  ##
+  print_plot6 <- callModule(photoMod,
+                            id = "photo",
+                            pvars = pvars(),
+                            global_df = shape_mod_print
+  )
+  #
+  #Process Plot####
+  ##
+  
+  geom_process <- callModule(processMod, "process", 
+                             shape = shape,
+                             plot_brush = reactive({input$plot_brush}), 
+                             spoint = list_plot3[[2]]) 
+  
+
   ##
   #renderCachedPlot#####
   ##
 
   output$plot1 <- renderCachedPlot({
-    #shiny::req(print_plot1(), print_plot2(),print_plot3())
-   t <-   ggplot() +
-      print_plot1() +
-      # print_plot2() +
-      # print_plot3() +
-       theme(axis.title.x=element_blank(),
-             axis.text.x=element_blank(),
-             axis.ticks.x=element_blank(),
-             panel.background = element_blank())
-   print(t)
-   
-      
+    plotInput()
     },
-    cacheKeyExpr = {list(print_plot1(), shape_mod_print())}
+    cacheKeyExpr = {list(print_plot1(),
+                         print_plot2(),
+                         print_plot3(),
+                         print_plot4(),
+                         print_plot5(),
+                         print_plot6(),
+                         geom_process()
+      )}
   )
- 
+  
+  plotInput = function() {
+    ggplot() +
+      print_plot1() +
+      print_plot4() +
+      print_plot2() +
+      print_plot3() +
+      print_plot5() +
+      print_plot6() + 
+      geom_process() +
+      theme(axis.title.x=element_blank(),
+            axis.text.x=element_blank(),
+            axis.ticks.x=element_blank(),
+            panel.background = element_blank())
+  }
+  
+  output$download1 <- downloadHandler(
+    filename = function() {paste("soilprofile", '.pdf', sep='') },
+    content = function(file) {
+      ggsave(file, plot = plotInput(), device = "pdf")
+    }
+  )
+  
 
 })
+
+
 

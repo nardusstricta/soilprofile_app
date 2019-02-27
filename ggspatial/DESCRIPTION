@@ -1,0 +1,42 @@
+Package: ggspatial
+Type: Package
+Title: Spatial Data Framework for ggplot2
+Version: 1.0.4
+Authors@R: c(
+    person("Dewey", "Dunnington",
+           email = "dewey@fishandwhistle.net", 
+           role = c("aut", "cre"), 
+           comment = c(ORCID = "0000-0002-9415-4582")
+    ),
+    person("Brent", "Thorne", role = "ctb", comment = c(ORCID = "0000-0002-1099-3857"))
+  )
+Maintainer: Dewey Dunnington <dewey@fishandwhistle.net>
+Description: Spatial data plus the power of the ggplot2 framework means easier mapping when input 
+  data are already in the form of spatial objects.
+License: GPL-3
+Depends: R (>= 2.10), ggplot2 (>= 2.2.1.9000)
+Imports: sf, rosm (>= 0.2), abind, reshape2, methods, plyr, raster,
+        tibble, scales, tidyr, rlang, grid
+Suggests: prettymapr, knitr, rmarkdown, sp, rgdal, testthat, dplyr,
+        withr, ggrepel, stars, covr
+URL: https://github.com/paleolimbot/ggspatial
+BugReports: https://github.com/paleolimbot/ggspatial/issues
+LazyData: TRUE
+RoxygenNote: 6.1.1
+Encoding: UTF-8
+VignetteBuilder: knitr
+RemoteType: github
+RemoteHost: api.github.com
+RemoteRepo: ggspatial
+RemoteUsername: paleolimbot
+RemoteRef: master
+RemoteSha: 0b3b1dcd64b7a101d2628fffbce261dfad0089f9
+GithubRepo: ggspatial
+GithubUsername: paleolimbot
+GithubRef: master
+GithubSHA1: 0b3b1dcd64b7a101d2628fffbce261dfad0089f9
+NeedsCompilation: no
+Packaged: 2019-01-31 12:03:58 UTC; gabriel
+Author: Dewey Dunnington [aut, cre] (0000-0002-9415-4582),
+  Brent Thorne [ctb] (0000-0002-1099-3857)
+Built: R 3.4.4; ; 2019-01-31 12:03:59 UTC; unix

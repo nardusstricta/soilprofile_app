@@ -1,0 +1,6 @@
+Profile,name,depth,skel_dim,skel_ab,polygon_shape,col,root_ab,root_dim,orientation
+Braunerde,Ah,0-20,.1-.8,.4,NA,7.5YR 2/1,many,0.2,h
+Braunerde,AhBv,20-30,.1-.8,.4,NA,10YR 5/4,many,0.2,h
+Braunerde,Bv,30-60,5-8,0.05,6,5YR 2/1,many,0.2,h
+Braunerde,C,60-100,5-8,.75,12,2.5Y 5/3,abundant,0.5,v
+Braunerde,CvFe,100-160,10-18,.75,12,2.5Y 5/3,abundant,0.5,v
