@@ -1,7 +1,17 @@
-#numeric Input:
+#process modul
 processUI <- function(id) {
   ns <- NS(id)
-  actionButton(ns("rm_prozess"), "remove all")
+  box(
+    width = NULL, collapsible = TRUE,
+    title = "Process settings", solidHeader = TRUE,
+    plotOutput(ns("legend")),
+    splitLayout(
+      actionButton(ns("rm_prozess"), "remove all processes"),
+      downloadButton(ns('download2'), 'Download')
+    )
+    
+  )
+
 }
 
 processMod <- function(input, output, session, shape, plot_brush, spoint) {
@@ -24,10 +34,9 @@ processMod <- function(input, output, session, shape, plot_brush, spoint) {
                               }
                               "))),
       plotOutput(session$ns("plot_mod_1")),
-      span("Wähle eine Eigenschaft aus. Bei einem Abstand von 1 wird nur ein Symbol gezeichnet, welche größe
-         Abhängig von der markierten Fläche ist"),
+      span("Select a property. The number and size can be set manually unless only one icon is drawn. Then the size refers to the selected area."),
       if (failed)
-        div(tags$b("Bitte wähle eine Eigenschaft aus", style = "color: red;")),
+        div(tags$b("Please select a property", style = "color: red;")),
       
       footer = tagList(
         modalButton("Cancel"),
@@ -37,7 +46,7 @@ processMod <- function(input, output, session, shape, plot_brush, spoint) {
   }
   
   ##
-  #Interactive Prozesses####
+  #Interactive processes####
   ##
   
   # Show modal when button is clicked.
@@ -69,7 +78,7 @@ processMod <- function(input, output, session, shape, plot_brush, spoint) {
           color = id_attr()$color,
           fill = id_attr()$fill,
           shape = id_attr()$shape, 
-          #stroke = id_attr()$stroke,
+          stroke = id_attr()$stroke,
           size = ifelse(input$one1 == TRUE, 
                         abs(plot_brush()$ymax - plot_brush()$ymin) * 3,
                         input$size),
@@ -96,13 +105,13 @@ processMod <- function(input, output, session, shape, plot_brush, spoint) {
     }
   })
   
-  onBookmark(function(state) {
-    state$values$currentSum <- df_geom$data
-  })
-  
-  onRestore(function(state) {
-    df_geom$data <- state$values$currentSum
-  })
+  # onBookmark(function(state) {
+  #   state$values$currentSum <- df_geom$data
+  # })
+  # 
+  # onRestore(function(state) {
+  #   df_geom$data <- state$values$currentSum
+  # })
   
   output$plot_mod_1 <- renderPlot({
     if(input$dataset != "bitte Auswählen"){
@@ -145,6 +154,7 @@ processMod <- function(input, output, session, shape, plot_brush, spoint) {
           color = character(0),
           fill = character(0),
           shape = numeric(0),
+          stroke = numeric(0),
           size = numeric(0),
           st_sfc()
         )
@@ -158,8 +168,51 @@ processMod <- function(input, output, session, shape, plot_brush, spoint) {
   legend_react <- reactive({
     req(df_geom$data$name)
     data.frame(name = unique(df_geom$data$name)) %>% 
-      left_join(shape, by = "name")
+      left_join(shape, by = "name") %>% 
+      rbind(
+        data.frame(
+          name = c("clay", "silt", "sand"),
+          shape = c(19, 19, 19),
+          color =c("grey", "grey", "grey"),
+          fill = c(NA, NA, NA),
+          stroke = c(.1, 1, 10)
+        )
+      )
   })
+  
+  
+  output$legend <- renderPlot({
+    plot_legend()
+  })
+  
+  plot_legend <- function() {
+    ggplot() +
+      scale_y_discrete(name= "") +
+      scale_x_continuous(limits=c(0,10), breaks=NULL, name= "") +
+      scale_shape_discrete(solid=T, guide=FALSE) +
+      geom_point(data=legend_react(), 
+                 mapping=aes(x=1,
+                             y=name
+                 ),
+                 shape = legend_react()$shape,
+                 fill = legend_react()$fill,
+                 col = legend_react()$col, 
+                 stroke = legend_react()$stroke,
+                 size=8) + ggplot2::theme(axis.title.x = ggplot2::element_blank(), 
+                                          axis.text.y = ggplot2::element_text(size = 13),
+                                          axis.text.x = ggplot2::element_blank(), 
+                                          axis.ticks.x = ggplot2::element_blank(), 
+                                          axis.ticks.y = ggplot2::element_blank(), 
+                                          panel.background = ggplot2::element_blank()) +
+      ggplot2::ggtitle("Legend")
+  }
+  
+  output$download2 <- downloadHandler(
+    filename = function() {paste("soilprofile_legend", '.pdf', sep='') },
+    content = function(file) {
+      ggsave(file, plot = plot_legend(), device = "pdf")
+    }
+  )
   
   erg <- reactive({
     geom_sf(data = df_geom$data, 

@@ -1,9 +1,7 @@
-#options(shiny.reactlog=TRUE)
-#shiny::runApp
 shinyServer(function(input, output, session){
 
 ##
-#data Import:####
+#data import:####
 ##
 
   datafile <- callModule(csvFile, "datafile") 
@@ -11,6 +9,7 @@ shinyServer(function(input, output, session){
   df_global1 <- reactive({
     data_mod(datafile())
   })
+  
   #table output:
   output$table1 <- renderTable({
     df_global1()
@@ -26,7 +25,7 @@ shinyServer(function(input, output, session){
     sf_polygon(df_geom = df_global2(), df_attri = df_global1())
   })
   
-  #set length of each Input Paramert (number of horizons)
+  #set length of each input paramert (number of horizons)
   pvars <- reactive({
     nrow(df_global3())
   })
@@ -37,9 +36,10 @@ shinyServer(function(input, output, session){
   })
    
 ##
-#Plot1#####
+#Plot1 expansion#####
 ##
  
+  #Adjustment for horizon shape expansion and color 
   numberX <- callModule(sliderMod, id = "numberX",
                         label = df_global3()$nameC,
                         value = rep(1, pvars()), 
@@ -64,7 +64,7 @@ shinyServer(function(input, output, session){
                    value = rep(TRUE, pvars()),
                    name = "smooth",
                    pvars = pvars())
-  #extention:
+  #extention (horizont transitions):
   select_smooth <- callModule(selectMod, id = "sel_smoth", 
                               label = df_global3()$nameC[-1],
                               value = rep(FALSE, pvars()-1),
@@ -108,7 +108,7 @@ shinyServer(function(input, output, session){
                         step = rep(.1, pvars()-1))
                                
   
-                   
+  #Attribute table with the properties of the horizon transitions                  
   df_smooth <- reactive({
     data.frame(
       buffer_size = sm_buffer_size(), 
@@ -120,7 +120,7 @@ shinyServer(function(input, output, session){
   })
 
 
-  
+  #Calculating the horizon polygons 
   shape_mod_print <- reactive({
     line1 <- line_mod(df_geom = df_global2(),
                       line_attri = data.frame(name= seq(pvars()),
@@ -145,6 +145,7 @@ shinyServer(function(input, output, session){
     }
   })
   
+  #Adjustment of the colour transparency
   alpha_bg <- callModule(
     sliderMod, id = "alpha_bg", 
     label = df_global3()$nameC,
@@ -156,6 +157,7 @@ shinyServer(function(input, output, session){
     step = rep(.1, pvars()),
     sWH = FALSE)
   
+  #plotting
   print_plot1 <- reactive({
       geom_sf(data = shape_mod_print(),
               fill = shape_mod_print()$rgb_col, 
@@ -185,7 +187,7 @@ shinyServer(function(input, output, session){
   print_plot3 <- list_plot3[[1]]
   
   ##
-  #Plot 4 roots ####
+  #Plot4 roots ####
   ##
   
   print_plot4 <- callModule(outer_root, 
@@ -194,7 +196,7 @@ shinyServer(function(input, output, session){
                             pvars = pvars)
   
   ##
-  #Plot 5 structure####
+  #Plot5 structure####
   ##
   
   print_plot5 <- callModule(textMod, 
@@ -206,15 +208,15 @@ shinyServer(function(input, output, session){
                           global_df = shape_mod_print
                           )
   ##
-  #Plot 6 Photo import
+  #Plot6 Photo import
   ##
   print_plot6 <- callModule(photoMod,
                             id = "photo",
                             pvars = pvars(),
                             global_df = shape_mod_print
   )
-  #
-  #Process Plot####
+  ##
+  #Process Layer####
   ##
   
   geom_process <- callModule(processMod, "process", 
@@ -249,12 +251,16 @@ shinyServer(function(input, output, session){
       print_plot5() +
       print_plot6() + 
       geom_process() +
+      geom_sf_text(data = df_global3(), aes(label = nameC),
+                   nudge_x = (sf::st_bbox(df_global3())[[3]] -
+                                sf::st_bbox(df_global3())[[1]]) /2 + 3) + 
       theme(axis.title.x=element_blank(),
             axis.text.x=element_blank(),
             axis.ticks.x=element_blank(),
             panel.background = element_blank())
   }
   
+  #download file
   output$download1 <- downloadHandler(
     filename = function() {paste("soilprofile", '.pdf', sep='') },
     content = function(file) {

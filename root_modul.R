@@ -1,3 +1,23 @@
+###
+#fuction for roots layer####
+###
+mutiple_roots <- function(polygon, number, 
+                          line_length, horizont_id,
+                          variation = .4, smoothness = 5, par_attr){
+  geom_erg <- do.call(rbind, lapply(1:nrow(polygon), function(i) { 
+    set.seed(12)
+    basic_random_line(polygon = polygon[i,], 
+                      number = number[i],
+                      line_length = line_length[i],
+                      variation = variation,
+                      smoothness = 4) %>% 
+      mutate(horizont_id = horizont_id[i]) %>% 
+      sf::st_sf()
+  })) 
+  return(geom_erg)
+}
+
+#Moduls:
 outer_rootUI <- function(id) {
   ns <- NS(id)
   

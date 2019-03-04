@@ -5,9 +5,10 @@ function(request) {
                 menuItem("Plot", tabName="plot", icon=icon("line-chart")),
                 menuItem("Table import", tabName = "table", icon=icon("table"), selected=TRUE),
                 menuItem("Codes",  icon = icon("file-text-o"),
-                         menuSubItem("Mlxtran", tabName = "pkmodel", icon = icon("angle-right")),
+                         menuSubItem("global.R", tabName = "global", icon = icon("angle-right")),
                          menuSubItem("ui.R", tabName = "ui", icon = icon("angle-right")),
-                         menuSubItem("server.R", tabName = "server", icon = icon("angle-right"))
+                         menuSubItem("server.R", tabName = "server", icon = icon("angle-right")),
+                         menuSubItem("structure", tabName = "structure", icon = icon("angle-right"))
                 ),
                 menuItem("ReadMe", tabName = "readme", icon=icon("mortar-board")),
                 menuItem("About", tabName = "about", icon = icon("question"))
@@ -33,10 +34,14 @@ function(request) {
   
   body <- dashboardBody(
     tabItems(
-      #   tabItem(tabName = "readme",
-      #           withMathJax(), 
-      #           includeMarkdown("readMe.Rmd")
-      #   ),
+        tabItem(tabName = "readme",
+                fluidPage(
+                  tags$iframe(src = './readme.html', 
+                              width = '100%', height = '800px', 
+                              frameborder = 0, scrolling = 'auto'
+                  )
+                )
+        ),
       tabItem(tabName = "plot",
               fluidRow(
                 column(width = 6, 
@@ -125,7 +130,7 @@ function(request) {
                 ),
                 column(
                   width = 6,
-                  box(width = NULL, plotOutput("plot1", height="750px", brush = "plot_brush"), 
+                  box(width = NULL, plotOutput("plot1", height="650px", brush = "plot_brush"), 
                       title = "Plot", solidHeader = TRUE, status = "primary")
                   
                 )
@@ -137,30 +142,49 @@ function(request) {
                   br(),
                   tableOutput("table1")
               )
+      ),
+      tabItem(tabName = "global",
+              box(width = NULL, status = "primary", solidHeader = TRUE, title= "global.R",
+                  downloadButton('downloadData1', 'Download'),
+                  br(),br(),
+                  pre(includeText("global.R"))
+
+              )
+      ),
+      tabItem(tabName = "ui",
+              box( width = NULL, status = "primary", solidHeader = TRUE, title="ui.R",
+                   downloadButton('downloadData2', 'Download'),
+                   br(),br(),
+                   pre(includeText("ui.R"))
+              )
+      ),
+      tabItem(tabName = "server",
+              box( width = NULL, status = "primary", solidHeader = TRUE, title="server.R",
+                   downloadButton('downloadData3', 'Download'),
+                   br(),br(),
+                   pre(includeText("server.R"))
+              )
+      ),
+      tabItem(tabName = "structure",
+              box( width = NULL, status = "primary", solidHeader = TRUE, title= "Reactive Log Visualizer",
+                helpText("Graphical representation of the reactive expressions called in the app. It is a minimal example with only the color and horizon setting as adjustable value. To build the graphic please use the mouse and drag the blue bar to the right."),
+                tags$iframe(src = './reactlog_mini.html', 
+                            width = '100%', height = '800px',
+                            frameborder = 0, scrolling = 'auto'
+                )
+              )
+
+      ),
+      tabItem(tabName = "about",
+              fluidPage(
+                   tags$iframe(src = './about.html', 
+                               width = '100%', height = '800px',
+                               frameborder = 0, scrolling = 'auto'
+                   )
+              )
+              
       )
-      # tabItem(tabName = "pkmodel",
-      #         box(width = NULL, status = "primary", solidHeader = TRUE, title="Edit",
-      #             editModUI("eview", width="100%", height="400px")
-      #   
-      #         )
-      #)
-      # tabItem(tabName = "ui",
-      #         box( width = NULL, status = "primary", solidHeader = TRUE, title="ui.R",
-      #              downloadButton('downloadData2', 'Download'),
-      #              br(),br(),
-      #              pre(includeText("ui.R"))
-      #         )
-      # ),
-      # tabItem(tabName = "server",
-      #         box( width = NULL, status = "primary", solidHeader = TRUE, title="server.R",
-      #              downloadButton('downloadData3', 'Download'),
-      #              br(),br(),
-      #              pre(includeText("server.R"))
-      #         )
-      # ),
-      # tabItem(tabName = "about",
-      #         includeMarkdown("../../about/about.Rmd")
-      # )
+      
     )
   )
   

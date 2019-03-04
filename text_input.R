@@ -1,10 +1,13 @@
-#structure input
+###
+#structure Layer####
+###
 textUI <- function(id) {
   ns <- NS(id)
   uiOutput(ns("ui_text"))
 }
 
-textMod <- function(input, output, session, label, name, pvars, choices, global_df) {
+textMod <- function(input, output, session, label, 
+                    name, pvars, choices, global_df) {
   
   mask_poly <- function(import_poly, horizont){
     bb_ho <- st_bbox(horizont)
@@ -74,51 +77,54 @@ textMod <- function(input, output, session, label, name, pvars, choices, global_
   vals <- reactiveValues(data = struc_poly[,-1])
   
   observeEvent(input$savepng,{
-    if(is.null(input$stru_name)| is.null(userPng()$datapath))
+    if(is.null(input$stru_name)| is.null(userPng()$datapath)){
       showNotification("You have to select a file and enter a name")
-    
-    shiny::req(input$stru_name, userPng()$datapath)
-    withProgress(message = 'Structure is created',
-                 detail = 'please wait a moment.', value = 0,{
-                   for (i in 1:15) {
-                     incProgress(1/15)
-                     Sys.sleep(0.25)
-                   }
-                   polygon1 <- sf::st_polygon(list(rbind(c(0,0),
-                                                         c(1,0), 
-                                                         c(1,-1),
-                                                         c(0,-1),
-                                                         c(0,0)))) %>% 
-                     sf::st_sfc() %>% 
-                     sf::st_sf()  
-                   
-                   erg34 <-  png_import(userPng()$datapath, polygon1) %>% 
-                     mutate(name = input$stru_name) %>% 
-                     select(-layer)
-                   
-                   
-                   vals$data <-  rbind(
-                     vals$data,  erg34
-                   )
-
-                 })
+    }else{
+      
+      withProgress(message = 'Structure is created',
+                   detail = 'please wait a moment.', value = 0,{
+                     for (i in 1:15) {
+                       incProgress(1/15)
+                       Sys.sleep(0.25)
+                     }
+                     polygon1 <- sf::st_polygon(list(rbind(c(0,0),
+                                                           c(1,0), 
+                                                           c(1,-1),
+                                                           c(0,-1),
+                                                           c(0,0)))) %>% 
+                       sf::st_sfc() %>% 
+                       sf::st_sf()  
+                     library(rgeos)
+                     erg34 <-  png_import(userPng()$datapath, polygon1) %>% 
+                       mutate(name = input$stru_name) %>% 
+                       select(-layer)
+                     
+                     vals$data <-  rbind(
+                       vals$data,  erg34
+                     )
+                     
+                   })
+    }
   })
+  ###
+  #Bookmarking for server applications
+  ###
   
-  onBookmark(function(state) {
-    state$values$current_stru <- vals$data
-  })
-  
-  onRestore(function(state) {
-    vals$data <- state$values$current_stru
-  })
+  # onBookmark(function(state) {
+  #   state$values$current_stru <- vals$data
+  # })
+  # 
+  # onRestore(function(state) {
+  #   vals$data <- state$values$current_stru
+  # })
 
   erg0 <- reactive({
     if(all(unlist(struc_par())== ""))
       return(NULL)
     temp <-  data.frame(
-      name = unlist(struc_par()),
-      horizont_id = label,
-      fill = unlist(struc_col())
+      name = as.factor(unlist(struc_par())),
+      horizont_id = as.factor(label),
+      fill = as.factor(unlist(struc_col()))
     ) %>% 
       filter(name != "") %>% 
       left_join(vals$data, by = "name") %>% 
@@ -130,7 +136,7 @@ textMod <- function(input, output, session, label, name, pvars, choices, global_
     
   erg1 <- global_df() %>% 
     select(nameC, geometry) %>% 
-    mutate(horizont_id = as.character(nameC)) %>% 
+    mutate(horizont_id = nameC) %>% 
     right_join(temp, by = "horizont_id")
   
   erg2 <- do.call(rbind, lapply(1:nrow(temp), function(i) { 

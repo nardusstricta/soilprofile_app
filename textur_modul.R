@@ -1,3 +1,6 @@
+###
+#Modul for texture pattern####
+###
 outer_textureUI <- function(id) {
   ns <- NS(id)
   
@@ -56,6 +59,9 @@ outer_textur <- function(input, output, session, df_global3, pvars) {
     
   })
   
+  ###
+  #plot output####
+  ###
   print_plot2 <- reactive({
     if(is.null(texture_layer()))
       return(NULL)

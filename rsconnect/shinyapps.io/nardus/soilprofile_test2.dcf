@@ -5,9 +5,9 @@ account: nardus
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 620291
-bundleId: 1772898
+bundleId: 1908917
 url: https://nardus.shinyapps.io/soilprofile_test2/
-when: 1545215127.36982
+when: 1551444647.46541
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: braunerde.csv|inputx.R|NA|.RData|.Rprofile|slinder_test.R|test_modul.R|test.R
+ignoredFiles: braunerde.csv|profvis_example.R|.Rprofile|tests

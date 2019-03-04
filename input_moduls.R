@@ -26,8 +26,8 @@ sliderMod <- function(input, output, session, label, value,
   })
   
   outputOptions(output, "ui_slider", suspendWhenHidden = sWH)
+  
   reactive({
-    #shiny::req(input[[paste0(label[pvars])]])
     lapply(seq(pvars), function(i) {req(input[[paste0(label[i])]])})
     sapply(seq(pvars),
            function(i) {
@@ -66,19 +66,9 @@ selectMod <- function(input, output, session, label,
   
   
   reactive({
-    #req(is.null(input[[paste0(label[pvars])]]))
     if (any(unlist(lapply(seq(pvars), function(i) {
       is.null(input[[paste0(label[i])]])})))){
       return(NULL) 
-    # }else{
-    #   validate(
-    #   do.call(need, lapply(seq(pvars),
-    #            function(i) {
-    #              input[[paste0(label[i])]]
-    #            })
-    #   ), message = FALSE
-    #   )
-         #req(input[[paste0(label[pvars])]])
        }
     
     sapply(seq(pvars),
@@ -114,7 +104,6 @@ colMod <- function(input, output, session, label, value, pvars, name, sWH = TRUE
   
   reactive({
     lapply(seq(pvars), function(i) {req(input[[paste0(label[i])]])})
-    #shiny::req(input[[paste0(label[pvars])]])
     lapply(seq(pvars),
            function(i) {
              input[[paste0(label[i])]]
@@ -152,13 +141,6 @@ numericMod <- function(input, output, session, label, value, min, max,
   
   reactive({
     lapply(seq(pvars), function(i) {req(input[[paste0(label[i])]])})
-    #shiny::req(input[[paste0(label[pvars])]])
-    # shiny::req(
-    #   sapply(seq(pvars),
-    #          function(i) {
-    #            input[[paste0(label[i])]]
-    #          })
-    # )
     sapply(seq(pvars),
            function(i) {
              input[[paste0(label[i])]]

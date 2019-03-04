@@ -1,0 +1,392 @@
+{
+  "input": {
+    "alpha_bg-AhZ": 1,
+    "alpha_bg-BvCv": 1,
+    "alpha_bg-Bvh": 1,
+    "._bookmark_": 0,
+    "datafile-file": null,
+    "datafile-use_example": true,
+    "numberX-AhZ": 3,
+    "numberX-BvCv": 1,
+    "numberX-Bvh": 5,
+    "plot_width": 3,
+    "process-rm_prozess": 0,
+    "rock-cellnumber-AhZ": 6,
+    "rock-cellnumber-BvCv": 6,
+    "rock-cellnumber-Bvh": 6,
+    "rock-point_shape-AhZ": 6,
+    "rock-point_shape-BvCv": 6,
+    "rock-point_shape-Bvh": 6,
+    "rock-rock-AhZ": false,
+    "rock-rock-BvCv": false,
+    "rock-rock-Bvh": false,
+    "rock-rock_col-AhZ": "#CED5D6CA",
+    "rock-rock_col-BvCv": "#CED5D6CA",
+    "rock-rock_col-Bvh": "#CED5D6CA",
+    "rock-rock_phi-AhZ": 0,
+    "rock-rock_phi-BvCv": 0,
+    "rock-rock_phi-Bvh": 0,
+    "rock-rock_sm-AhZ": true,
+    "rock-rock_sm-BvCv": true,
+    "rock-rock_sm-Bvh": true,
+    "rock-rotation-AhZ": 45,
+    "rock-rotation-BvCv": 45,
+    "rock-rotation-Bvh": 45,
+    "rock-strat_select-AhZ": false,
+    "rock-strat_select-BvCv": false,
+    "rock-strat_select-Bvh": false,
+    "rock-union_select-AhZ": false,
+    "rock-union_select-BvCv": false,
+    "rock-union_select-Bvh": false,
+    "root-rc11": "#8B5A00",
+    "root-variation": 0.4,
+    "root-wide": 1,
+    "sd-AhZ": 1.2,
+    "sd-BvCv": 0,
+    "sd-Bvh": 3,
+    "shape": 0.1,
+    "sidebarCollapsed": false,
+    "sidebarItemExpanded": null,
+    "sm-AhZ": true,
+    "sm-BvCv": true,
+    "sm-Bvh": false,
+    "tabs": "plot",
+    "texture-buffer": -1,
+    "texture-dist_grain": 1,
+    "texture-outline_col": "black",
+    "texture-size_grain": 1,
+    "texture-texture_bg": true
+  },
+  "output": {
+    "alpha_bg-ui_slider": {
+      "html": "<div class=\"col-sm-12\">\n  <h5>color transparency<\/h5>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" for=\"alpha_bg-AhZ\">AhZ<\/label>\n    <input class=\"js-range-slider\" id=\"alpha_bg-AhZ\" data-min=\"0\" data-max=\"1\" data-from=\"1\" data-step=\"0.1\" data-grid=\"true\" data-grid-num=\"10\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" for=\"alpha_bg-Bvh\">Bvh<\/label>\n    <input class=\"js-range-slider\" id=\"alpha_bg-Bvh\" data-min=\"0\" data-max=\"1\" data-from=\"1\" data-step=\"0.1\" data-grid=\"true\" data-grid-num=\"10\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" for=\"alpha_bg-BvCv\">BvCv<\/label>\n    <input class=\"js-range-slider\" id=\"alpha_bg-BvCv\" data-min=\"0\" data-max=\"1\" data-from=\"1\" data-step=\"0.1\" data-grid=\"true\" data-grid-num=\"10\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "ionrangeslider",
+          "version": "2.1.6",
+          "src": {
+            "href": "shared/ionrangeslider"
+          },
+          "meta": null,
+          "script": "js/ion.rangeSlider.min.js",
+          "stylesheet": [
+            "css/ion.rangeSlider.css",
+            "css/ion.rangeSlider.skinShiny.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        },
+        {
+          "name": "strftime",
+          "version": "0.9.2",
+          "src": {
+            "href": "shared/strftime"
+          },
+          "meta": null,
+          "script": "strftime-min.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        }
+      ]
+    },
+    "numberX-ui_slider": {
+      "html": "<div class=\"col-sm-12\">\n  <h5>Wave period<\/h5>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" for=\"numberX-AhZ\">AhZ<\/label>\n    <input class=\"js-range-slider\" id=\"numberX-AhZ\" data-min=\"1\" data-max=\"10\" data-from=\"1\" data-step=\"1\" data-grid=\"true\" data-grid-num=\"9\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" for=\"numberX-Bvh\">Bvh<\/label>\n    <input class=\"js-range-slider\" id=\"numberX-Bvh\" data-min=\"1\" data-max=\"10\" data-from=\"1\" data-step=\"1\" data-grid=\"true\" data-grid-num=\"9\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" for=\"numberX-BvCv\">BvCv<\/label>\n    <input class=\"js-range-slider\" id=\"numberX-BvCv\" data-min=\"1\" data-max=\"10\" data-from=\"1\" data-step=\"1\" data-grid=\"true\" data-grid-num=\"9\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "ionrangeslider",
+          "version": "2.1.6",
+          "src": {
+            "href": "shared/ionrangeslider"
+          },
+          "meta": null,
+          "script": "js/ion.rangeSlider.min.js",
+          "stylesheet": [
+            "css/ion.rangeSlider.css",
+            "css/ion.rangeSlider.skinShiny.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        },
+        {
+          "name": "strftime",
+          "version": "0.9.2",
+          "src": {
+            "href": "shared/strftime"
+          },
+          "meta": null,
+          "script": "strftime-min.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        }
+      ]
+    },
+    "plot1": {
+      "src": "[image data sha1: 146a6539c9730c656e6760649fec65321a935b91]",
+      "coordmap": {
+        "panels": [
+          {
+            "panel": 1,
+            "row": 1,
+            "col": 1,
+            "panel_vars": {
+
+            },
+            "log": {
+              "x": null,
+              "y": null
+            },
+            "domain": {
+              "left": -1.31666666666667,
+              "right": 27.65,
+              "bottom": -73.5582205801391,
+              "top": 4.722632182921
+            },
+            "mapping": {
+              "x": null,
+              "y": null,
+              "geometry": "geometry"
+            },
+            "range": {
+              "left": 57.3379437198684,
+              "right": 308.333289156844,
+              "bottom": 683.780821917808,
+              "top": 5.47945205479452
+            }
+          }
+        ],
+        "dims": {
+          "width": 334,
+          "height": 692
+        }
+      },
+      "class": "shiny-scalable"
+    },
+    "rock-cellnumber-ui_slider": {
+      "html": "<div class=\"col-sm-12\">\n  <h5>number of strata<\/h5>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" for=\"rock-cellnumber-AhZ\">AhZ<\/label>\n    <input class=\"js-range-slider\" id=\"rock-cellnumber-AhZ\" data-min=\"1\" data-max=\"40\" data-from=\"6\" data-step=\"1\" data-grid=\"true\" data-grid-num=\"9.75\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" for=\"rock-cellnumber-Bvh\">Bvh<\/label>\n    <input class=\"js-range-slider\" id=\"rock-cellnumber-Bvh\" data-min=\"1\" data-max=\"40\" data-from=\"6\" data-step=\"1\" data-grid=\"true\" data-grid-num=\"9.75\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" for=\"rock-cellnumber-BvCv\">BvCv<\/label>\n    <input class=\"js-range-slider\" id=\"rock-cellnumber-BvCv\" data-min=\"1\" data-max=\"40\" data-from=\"6\" data-step=\"1\" data-grid=\"true\" data-grid-num=\"9.75\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "ionrangeslider",
+          "version": "2.1.6",
+          "src": {
+            "href": "shared/ionrangeslider"
+          },
+          "meta": null,
+          "script": "js/ion.rangeSlider.min.js",
+          "stylesheet": [
+            "css/ion.rangeSlider.css",
+            "css/ion.rangeSlider.skinShiny.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        },
+        {
+          "name": "strftime",
+          "version": "0.9.2",
+          "src": {
+            "href": "shared/strftime"
+          },
+          "meta": null,
+          "script": "strftime-min.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        }
+      ]
+    },
+    "rock-point_shape-ui_slider": {
+      "html": "<div class=\"col-sm-12\">\n  <h5>Sides number of stones<\/h5>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" for=\"rock-point_shape-AhZ\">AhZ<\/label>\n    <input class=\"js-range-slider\" id=\"rock-point_shape-AhZ\" data-min=\"3\" data-max=\"50\" data-from=\"6\" data-step=\"1\" data-grid=\"true\" data-grid-num=\"9.4\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" for=\"rock-point_shape-Bvh\">Bvh<\/label>\n    <input class=\"js-range-slider\" id=\"rock-point_shape-Bvh\" data-min=\"3\" data-max=\"50\" data-from=\"6\" data-step=\"1\" data-grid=\"true\" data-grid-num=\"9.4\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" for=\"rock-point_shape-BvCv\">BvCv<\/label>\n    <input class=\"js-range-slider\" id=\"rock-point_shape-BvCv\" data-min=\"3\" data-max=\"50\" data-from=\"6\" data-step=\"1\" data-grid=\"true\" data-grid-num=\"9.4\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "ionrangeslider",
+          "version": "2.1.6",
+          "src": {
+            "href": "shared/ionrangeslider"
+          },
+          "meta": null,
+          "script": "js/ion.rangeSlider.min.js",
+          "stylesheet": [
+            "css/ion.rangeSlider.css",
+            "css/ion.rangeSlider.skinShiny.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        },
+        {
+          "name": "strftime",
+          "version": "0.9.2",
+          "src": {
+            "href": "shared/strftime"
+          },
+          "meta": null,
+          "script": "strftime-min.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        }
+      ]
+    },
+    "rock-rock_col-ui_col": {
+      "html": "<div class=\"col-sm-12\">\n  <h5>stone color <\/h5>\n  <div class=\"form-group shiny-input-container\" data-shiny-input-type=\"colour\">\n    <label for=\"rock-rock_col-AhZ\">AhZ<\/label>\n    <input id=\"rock-rock_col-AhZ\" type=\"text\" class=\"form-control shiny-colour-input\" data-init-value=\"#CED5D6CA\" data-show-colour=\"both\" data-palette=\"square\" data-allow-alpha=\"true\"/>\n  <\/div>\n  <div class=\"form-group shiny-input-container\" data-shiny-input-type=\"colour\">\n    <label for=\"rock-rock_col-Bvh\">Bvh<\/label>\n    <input id=\"rock-rock_col-Bvh\" type=\"text\" class=\"form-control shiny-colour-input\" data-init-value=\"#CED5D6CA\" data-show-colour=\"both\" data-palette=\"square\" data-allow-alpha=\"true\"/>\n  <\/div>\n  <div class=\"form-group shiny-input-container\" data-shiny-input-type=\"colour\">\n    <label for=\"rock-rock_col-BvCv\">BvCv<\/label>\n    <input id=\"rock-rock_col-BvCv\" type=\"text\" class=\"form-control shiny-colour-input\" data-init-value=\"#CED5D6CA\" data-show-colour=\"both\" data-palette=\"square\" data-allow-alpha=\"true\"/>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "colourpicker-binding",
+          "version": "0.1.0",
+          "src": {
+            "href": "colourpicker-binding"
+          },
+          "meta": null,
+          "script": "input_binding_colour.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        },
+        {
+          "name": "colourpicker-lib",
+          "version": "0.1.0",
+          "src": {
+            "href": "colourpicker-lib"
+          },
+          "meta": null,
+          "script": "js/colourpicker.min.js",
+          "stylesheet": "css/colourpicker.min.css",
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        }
+      ]
+    },
+    "rock-rock_phi-ui_slider": {
+      "html": "<div class=\"col-sm-12\">\n  <h5>elliptical shape<\/h5>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" for=\"rock-rock_phi-AhZ\">AhZ<\/label>\n    <input class=\"js-range-slider\" id=\"rock-rock_phi-AhZ\" data-min=\"0\" data-max=\"1\" data-from=\"0\" data-step=\"0.1\" data-grid=\"true\" data-grid-num=\"10\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" for=\"rock-rock_phi-Bvh\">Bvh<\/label>\n    <input class=\"js-range-slider\" id=\"rock-rock_phi-Bvh\" data-min=\"0\" data-max=\"1\" data-from=\"0\" data-step=\"0.1\" data-grid=\"true\" data-grid-num=\"10\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" for=\"rock-rock_phi-BvCv\">BvCv<\/label>\n    <input class=\"js-range-slider\" id=\"rock-rock_phi-BvCv\" data-min=\"0\" data-max=\"1\" data-from=\"0\" data-step=\"0.1\" data-grid=\"true\" data-grid-num=\"10\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "ionrangeslider",
+          "version": "2.1.6",
+          "src": {
+            "href": "shared/ionrangeslider"
+          },
+          "meta": null,
+          "script": "js/ion.rangeSlider.min.js",
+          "stylesheet": [
+            "css/ion.rangeSlider.css",
+            "css/ion.rangeSlider.skinShiny.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        },
+        {
+          "name": "strftime",
+          "version": "0.9.2",
+          "src": {
+            "href": "shared/strftime"
+          },
+          "meta": null,
+          "script": "strftime-min.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        }
+      ]
+    },
+    "rock-rock_sm-ui_select": {
+      "html": "<div class=\"col-sm-5\">\n  <h5>rounded stones<\/h5>\n  <div class=\"form-group shiny-input-container\">\n    <div class=\"checkbox\">\n      <label>\n        <input id=\"rock-rock_sm-AhZ\" type=\"checkbox\" checked=\"checked\"/>\n        <span>AhZ<\/span>\n      <\/label>\n    <\/div>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <div class=\"checkbox\">\n      <label>\n        <input id=\"rock-rock_sm-Bvh\" type=\"checkbox\" checked=\"checked\"/>\n        <span>Bvh<\/span>\n      <\/label>\n    <\/div>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <div class=\"checkbox\">\n      <label>\n        <input id=\"rock-rock_sm-BvCv\" type=\"checkbox\" checked=\"checked\"/>\n        <span>BvCv<\/span>\n      <\/label>\n    <\/div>\n  <\/div>\n<\/div>",
+      "deps": [
+
+      ]
+    },
+    "rock-rock-ui_select": {
+      "html": "<div class=\"col-sm-5\">\n  <h5>hide stones<\/h5>\n  <div class=\"form-group shiny-input-container\">\n    <div class=\"checkbox\">\n      <label>\n        <input id=\"rock-rock-AhZ\" type=\"checkbox\"/>\n        <span>AhZ<\/span>\n      <\/label>\n    <\/div>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <div class=\"checkbox\">\n      <label>\n        <input id=\"rock-rock-Bvh\" type=\"checkbox\"/>\n        <span>Bvh<\/span>\n      <\/label>\n    <\/div>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <div class=\"checkbox\">\n      <label>\n        <input id=\"rock-rock-BvCv\" type=\"checkbox\"/>\n        <span>BvCv<\/span>\n      <\/label>\n    <\/div>\n  <\/div>\n<\/div>",
+      "deps": [
+
+      ]
+    },
+    "rock-rotation-ui_numeric": {
+      "html": "<div class=\"col-sm-5\">\n  <h5>angle of strata<\/h5>\n  <div class=\"form-group shiny-input-container\">\n    <label for=\"rock-rotation-AhZ\">AhZ<\/label>\n    <input id=\"rock-rotation-AhZ\" type=\"number\" class=\"form-control\" value=\"45\" min=\"-180\" max=\"180\" step=\"1\"/>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <label for=\"rock-rotation-Bvh\">Bvh<\/label>\n    <input id=\"rock-rotation-Bvh\" type=\"number\" class=\"form-control\" value=\"45\" min=\"-180\" max=\"180\" step=\"1\"/>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <label for=\"rock-rotation-BvCv\">BvCv<\/label>\n    <input id=\"rock-rotation-BvCv\" type=\"number\" class=\"form-control\" value=\"45\" min=\"-180\" max=\"180\" step=\"1\"/>\n  <\/div>\n<\/div>",
+      "deps": [
+
+      ]
+    },
+    "rock-strat_select-ui_select": {
+      "html": "<div class=\"col-sm-5\">\n  <h5>shall be stratified<\/h5>\n  <div class=\"form-group shiny-input-container\">\n    <div class=\"checkbox\">\n      <label>\n        <input id=\"rock-strat_select-AhZ\" type=\"checkbox\"/>\n        <span>AhZ<\/span>\n      <\/label>\n    <\/div>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <div class=\"checkbox\">\n      <label>\n        <input id=\"rock-strat_select-Bvh\" type=\"checkbox\"/>\n        <span>Bvh<\/span>\n      <\/label>\n    <\/div>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <div class=\"checkbox\">\n      <label>\n        <input id=\"rock-strat_select-BvCv\" type=\"checkbox\"/>\n        <span>BvCv<\/span>\n      <\/label>\n    <\/div>\n  <\/div>\n<\/div>",
+      "deps": [
+
+      ]
+    },
+    "rock-union_select-ui_select": {
+      "html": "<div class=\"col-sm-5\">\n  <h5>stones  be united<\/h5>\n  <div class=\"form-group shiny-input-container\">\n    <div class=\"checkbox\">\n      <label>\n        <input id=\"rock-union_select-AhZ\" type=\"checkbox\"/>\n        <span>AhZ<\/span>\n      <\/label>\n    <\/div>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <div class=\"checkbox\">\n      <label>\n        <input id=\"rock-union_select-Bvh\" type=\"checkbox\"/>\n        <span>Bvh<\/span>\n      <\/label>\n    <\/div>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <div class=\"checkbox\">\n      <label>\n        <input id=\"rock-union_select-BvCv\" type=\"checkbox\"/>\n        <span>BvCv<\/span>\n      <\/label>\n    <\/div>\n  <\/div>\n<\/div>",
+      "deps": [
+
+      ]
+    },
+    "sd-ui_slider": {
+      "html": "<div class=\"col-sm-12\">\n  <h5>Amplitude<\/h5>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" for=\"sd-AhZ\">AhZ<\/label>\n    <input class=\"js-range-slider\" id=\"sd-AhZ\" data-min=\"0\" data-max=\"2\" data-from=\"0\" data-step=\"0.1\" data-grid=\"true\" data-grid-num=\"10\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" for=\"sd-Bvh\">Bvh<\/label>\n    <input class=\"js-range-slider\" id=\"sd-Bvh\" data-min=\"0\" data-max=\"3\" data-from=\"0\" data-step=\"0.1\" data-grid=\"true\" data-grid-num=\"10\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" for=\"sd-BvCv\">BvCv<\/label>\n    <input class=\"js-range-slider\" id=\"sd-BvCv\" data-min=\"0\" data-max=\"3\" data-from=\"0\" data-step=\"0.1\" data-grid=\"true\" data-grid-num=\"10\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "ionrangeslider",
+          "version": "2.1.6",
+          "src": {
+            "href": "shared/ionrangeslider"
+          },
+          "meta": null,
+          "script": "js/ion.rangeSlider.min.js",
+          "stylesheet": [
+            "css/ion.rangeSlider.css",
+            "css/ion.rangeSlider.skinShiny.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        },
+        {
+          "name": "strftime",
+          "version": "0.9.2",
+          "src": {
+            "href": "shared/strftime"
+          },
+          "meta": null,
+          "script": "strftime-min.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        }
+      ]
+    },
+    "sm-ui_select": {
+      "html": "<div class=\"col-sm-5\">\n  <h5>smooth<\/h5>\n  <div class=\"form-group shiny-input-container\">\n    <div class=\"checkbox\">\n      <label>\n        <input id=\"sm-AhZ\" type=\"checkbox\" checked=\"checked\"/>\n        <span>AhZ<\/span>\n      <\/label>\n    <\/div>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <div class=\"checkbox\">\n      <label>\n        <input id=\"sm-Bvh\" type=\"checkbox\" checked=\"checked\"/>\n        <span>Bvh<\/span>\n      <\/label>\n    <\/div>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <div class=\"checkbox\">\n      <label>\n        <input id=\"sm-BvCv\" type=\"checkbox\" checked=\"checked\"/>\n        <span>BvCv<\/span>\n      <\/label>\n    <\/div>\n  <\/div>\n<\/div>",
+      "deps": [
+
+      ]
+    },
+    "table1": "<table  class = 'table shiny-table table- spacing-s' style = 'width:auto;'>\n<thead> <tr> <th style='text-align: right;'> name <\/th> <th style='text-align: right;'> from1 <\/th> <th style='text-align: right;'> to1 <\/th> <th style='text-align: left;'> hue_col <\/th> <th style='text-align: right;'> value_col <\/th> <th style='text-align: right;'> chroma_col <\/th> <th style='text-align: right;'> skel_dim_from <\/th> <th style='text-align: right;'> skel_dim_to <\/th> <th style='text-align: right;'> skel_ab <\/th> <th style='text-align: right;'> clay <\/th> <th style='text-align: right;'> silt <\/th> <th style='text-align: right;'> sand <\/th> <th style='text-align: left;'> nameC <\/th> <th style='text-align: left;'> rgb_col <\/th>  <\/tr> <\/thead> <tbody>\n  <tr> <td align=\"right\">   1 <\/td> <td align=\"right\"> 0.00 <\/td> <td align=\"right\"> 15.00 <\/td> <td> 7.5YR <\/td> <td align=\"right\"> 2.00 <\/td> <td align=\"right\"> 1.00 <\/td> <td align=\"right\"> 0.10 <\/td> <td align=\"right\"> 0.80 <\/td> <td align=\"right\"> 0.20 <\/td> <td align=\"right\"> 1.00 <\/td> <td align=\"right\"> 0.00 <\/td> <td align=\"right\"> 0.00 <\/td> <td> AhZ <\/td> <td> #39302BFF <\/td> <\/tr>\n  <tr> <td align=\"right\">   2 <\/td> <td align=\"right\"> 15.00 <\/td> <td align=\"right\"> 43.40 <\/td> <td> 10YR <\/td> <td align=\"right\"> 4.00 <\/td> <td align=\"right\"> 3.00 <\/td> <td align=\"right\"> 1.00 <\/td> <td align=\"right\"> 2.00 <\/td> <td align=\"right\"> 0.40 <\/td> <td align=\"right\"> 0.80 <\/td> <td align=\"right\"> 0.50 <\/td> <td align=\"right\"> 0.20 <\/td> <td> Bvh <\/td> <td> #755D41FF <\/td> <\/tr>\n  <tr> <td align=\"right\">   3 <\/td> <td align=\"right\"> 43.40 <\/td> <td align=\"right\"> 70.00 <\/td> <td> 2.5Y <\/td> <td align=\"right\"> 5.00 <\/td> <td align=\"right\"> 3.00 <\/td> <td align=\"right\"> 2.00 <\/td> <td align=\"right\"> 3.00 <\/td> <td align=\"right\"> 0.90 <\/td> <td align=\"right\"> 0.00 <\/td> <td align=\"right\"> 0.50 <\/td> <td align=\"right\"> 0.50 <\/td> <td> BvCv <\/td> <td> #8B7958FF <\/td> <\/tr>\n   <\/tbody> <\/table>"
+  },
+  "export": {
+
+  }
+}

@@ -1,0 +1,33 @@
+---
+bibliography: references.bib
+output:
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## About
+The app was programmedas part of my master thesis at the [Chair of Soil Ecology](http://www.bodenkunde.uni-freiburg.de/index_html-en?set_language=en) of the University of Freiburg.  
+
+This application is governed by the
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
+
+You can use, modify and/or redistribute these codes under the terms of the GPL v3 license
+This Shiny application requires the following packages: 
+
+  - Shiny,  @shiny
+  - Sf, @sf
+  - dplyr, @dplyr
+  - ggplot, @ggplot2,
+  - smoothr, @smoothr
+  - shinydashboard, @shinydashboard
+
+Some elements from the app build by @app_vorlage were used.
+
+### Contact:
+
+Gabriel Holz
+gabriholz@gmail.com
+
+### References:

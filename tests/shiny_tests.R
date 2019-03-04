@@ -1,0 +1,5 @@
+library(shinytest)
+getwd()
+# Launch the target app (replace with the correct path)
+recordTest("/home/gabriel/Dokumente/Uni_Master/Masterarbeit/App/soilprofile")
+testApp("/home/gabriel/Dokumente/Uni_Master/Masterarbeit/App/soilprofile", "mytest.R")

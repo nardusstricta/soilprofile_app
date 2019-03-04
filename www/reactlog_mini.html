@@ -1,0 +1,5570 @@
+<!DOCTYPE html>
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,600' rel='stylesheet' type='text/css'>
+<style type="text/css">
+html, body {
+  font-family: 'Source Sans Pro', sans-serif;
+  font-weight: 400;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+div {
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+  cursor: default;
+}
+#instructions, #ended {
+  position: relative;
+  font-weight: 200;
+  color: #444;
+  top: 20px;
+  font-size: 30px;
+  text-align: center;
+}
+#ended strong {
+  font-weight: 600;
+}
+svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+.node {
+  cursor: pointer;
+}
+.node .tspanTime{
+  font-weight: bold;
+  font-size: 87%;
+  user-select: none;
+  transition: fill 0.75s ease;
+}
+.node .tspanLabel{
+  font-family: 'Source Code Pro', monospace;
+  font-weight: normal;
+  text-anchor: start;
+  fill: #999;
+  user-select: none;
+  transition: fill 0.75s ease;
+}
+.node.running .tspanLabel {
+  fill: black;
+}
+.node.changed .tspanLabel {
+  fill: red;
+}
+.node .tspanLabel {
+  white-space: pre;
+}
+.node path {
+  fill: white;
+  stroke: #999;
+  stroke-width: 7.5px;
+  transition: fill 0.75s ease;
+}
+.node.observer path {
+}
+.node.observable path {
+}
+.node.value path {
+}
+.node.invalidated path {
+  fill: #E0E0E0;
+  /*fill: url(#diagonalHatch);*/
+}
+.node.running path {
+  fill: #61B97E;
+}
+.node.fixed path {
+  stroke: #000;
+}
+#legend {
+  font-size: 22px;
+  position: fixed;
+  bottom: 10px;
+  right: 20px;
+}
+.color {
+  display: inline-block;
+  border: 1px solid #777;
+  height: 14px;
+  width: 14px;
+}
+.color.normal {
+  background-color: #white;
+}
+.color.invalidated {
+  background-color: #E0E0E0;
+}
+.color.running {
+  background-color: #61B97E;
+}
+#triangle {
+  fill: #CCC;
+}
+.link {
+  fill: none;
+  stroke: #CCC;
+  stroke-width: 0.5px;
+}
+#description {
+  position: fixed;
+  width: 300px;
+  left: 630px;
+  top: 36px;
+  height: auto;
+  display: none;
+}
+#timeline {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  transition: height 500ms;
+}
+#timeline, #timeline * {
+  cursor: pointer;
+}
+#timeline:hover {
+  height: 32px;
+}
+#timeline-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 12px;
+  background-color: silver;
+}
+#timeline-fill {
+  background-color: #28A3F2;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  transition: width 500ms;
+}
+</style>
+<script>
+var log = [
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr \"dataset\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9168
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 1\n $ dataset: chr \"rock\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.919
+  },
+  {
+    "action": "valueChange",
+    "id": "input$dataset",
+    "value": " chr \"rock\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9207
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:2] \"caption\" \"dataset\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9222
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 2\n $ caption: chr \"Data Summary\"\n $ dataset: chr \"rock\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9243
+  },
+  {
+    "action": "valueChange",
+    "id": "input$caption",
+    "value": " chr \"Data Summary\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9283
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:3] \"caption\" \"dataset\" \"obs\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9298
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 3\n $ caption: chr \"Data Summary\"\n $ obs    : int 10\n $ dataset: chr \"rock\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9323
+  },
+  {
+    "action": "valueChange",
+    "id": "input$obs",
+    "value": " int 10",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9339
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr \"output_caption_hidden\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9355
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 1\n $ output_caption_hidden: logi FALSE",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9373
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$output_caption_hidden",
+    "value": " logi FALSE",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9387
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:2] \"output_caption_hidden\" \"output_summary_hidden\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9401
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 2\n $ output_caption_hidden: logi FALSE\n $ output_summary_hidden: logi FALSE",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9424
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$output_summary_hidden",
+    "value": " logi FALSE",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.944
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:3] \"output_caption_hidden\" \"output_summary_hidden\" ...",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9455
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 3\n $ output_view_hidden   : logi FALSE\n $ output_caption_hidden: logi FALSE\n $ output_summary_hidden: logi FALSE",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9481
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$output_view_hidden",
+    "value": " logi FALSE",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9494
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:4] \"output_caption_hidden\" \"output_summary_hidden\" ...",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9509
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 4\n $ output_view_hidden   : logi FALSE\n $ output_caption_hidden: logi FALSE\n $ pixelratio           : int 2\n $ output_summary_hidden: logi FALSE",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.954
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$pixelratio",
+    "value": " int 2",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9555
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:5] \"output_caption_hidden\" \"output_summary_hidden\" ...",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9569
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 5\n $ output_view_hidden   : logi FALSE\n $ output_caption_hidden: logi FALSE\n $ pixelratio           : int 2\n $ output_summary_hidden: logi FALSE\n $ url_protocol         : chr \"http:\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9605
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$url_protocol",
+    "value": " chr \"http:\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9619
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:6] \"output_caption_hidden\" \"output_summary_hidden\" ...",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9633
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 6\n $ output_view_hidden   : logi FALSE\n $ output_caption_hidden: logi FALSE\n $ pixelratio           : int 2\n $ url_hostname         : chr \"127.0.0.1\"\n $ output_summary_hidden: logi FALSE\n $ url_protocol         : chr \"http:\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9671
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$url_hostname",
+    "value": " chr \"127.0.0.1\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9683
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:7] \"output_caption_hidden\" \"output_summary_hidden\" ...",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9697
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 7\n $ output_view_hidden   : logi FALSE\n $ url_port             : chr \"5643\"\n $ output_caption_hidden: logi FALSE\n $ pixelratio           : int 2\n $ url_hostname         : chr \"127.0.0.1\"\n $ output_summary_hidden: logi FALSE\n $ url_protocol         : chr \"http:\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9756
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$url_port",
+    "value": " chr \"5643\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9769
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:8] \"output_caption_hidden\" \"output_summary_hidden\" ...",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9784
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 8\n $ url_pathname         : chr \"\/\"\n $ output_view_hidden   : logi FALSE\n $ url_port             : chr \"5643\"\n $ output_caption_hidden: logi FALSE\n $ pixelratio           : int 2\n $ url_hostname         : chr \"127.0.0.1\"\n $ output_summary_hidden: logi FALSE\n $ url_protocol         : chr \"http:\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9828
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$url_pathname",
+    "value": " chr \"\/\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9841
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:9] \"output_caption_hidden\" \"output_summary_hidden\" ...",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9856
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 9\n $ url_pathname         : chr \"\/\"\n $ output_view_hidden   : logi FALSE\n $ url_port             : chr \"5643\"\n $ output_caption_hidden: logi FALSE\n $ pixelratio           : int 2\n $ url_hostname         : chr \"127.0.0.1\"\n $ output_summary_hidden: logi FALSE\n $ url_search           : chr \"\"\n $ url_protocol         : chr \"http:\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9904
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$url_search",
+    "value": " chr \"\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9918
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:10] \"output_caption_hidden\" \"output_summary_hidden\" ...",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9934
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 10\n $ url_pathname         : chr \"\/\"\n $ output_view_hidden   : logi FALSE\n $ url_port             : chr \"5643\"\n $ output_caption_hidden: logi FALSE\n $ url_hash_initial     : chr \"\"\n $ pixelratio           : int 2\n $ url_hostname         : chr \"127.0.0.1\"\n $ output_summary_hidden: logi FALSE\n $ url_search           : chr \"\"\n $ url_protocol         : chr \"http:\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9985
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$url_hash_initial",
+    "value": " chr \"\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212774.9998
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:11] \"output_caption_hidden\" \"output_summary_hidden\" ...",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0015
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 11\n $ url_pathname         : chr \"\/\"\n $ output_view_hidden   : logi FALSE\n $ url_port             : chr \"5643\"\n $ output_caption_hidden: logi FALSE\n $ url_hash_initial     : chr \"\"\n $ pixelratio           : int 2\n $ singletons           : chr \"\"\n $ url_hostname         : chr \"127.0.0.1\"\n $ output_summary_hidden: logi FALSE\n $ url_search           : chr \"\"\n $ url_protocol         : chr \"http:\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0077
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$singletons",
+    "value": " chr \"\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0094
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:12] \"allowDataUriScheme\" \"output_caption_hidden\" ...",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0113
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 12\n $ allowDataUriScheme   : logi TRUE\n $ url_pathname         : chr \"\/\"\n $ output_view_hidden   : logi FALSE\n $ url_port             : chr \"5643\"\n $ output_caption_hidden: logi FALSE\n $ url_hash_initial     : chr \"\"\n $ pixelratio           : int 2\n $ singletons           : chr \"\"\n $ url_hostname         : chr \"127.0.0.1\"\n $ output_summary_hidden: logi FALSE\n $ url_search           : chr \"\"\n $ url_protocol         : chr \"http:\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.018
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$allowDataUriScheme",
+    "value": " logi TRUE",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0194
+  },
+  {
+    "action": "ctx",
+    "id": "1",
+    "label": "output$caption",
+    "srcref": [
+      34,
+      32,
+      35,
+      17,
+      32,
+      17
+    ],
+    "srcfile": "server.R",
+    "type": "observer",
+    "prevId": "",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0244
+  },
+  {
+    "action": "invalidate",
+    "id": "1",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0259
+  },
+  {
+    "action": "ctx",
+    "id": "2",
+    "label": "output$summary",
+    "srcref": [
+      42,
+      33,
+      44,
+      20,
+      33,
+      20
+    ],
+    "srcfile": "server.R",
+    "type": "observer",
+    "prevId": "",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0286
+  },
+  {
+    "action": "invalidate",
+    "id": "2",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0297
+  },
+  {
+    "action": "ctx",
+    "id": "3",
+    "label": "output$view",
+    "srcref": [
+      50,
+      30,
+      51,
+      39,
+      30,
+      39
+    ],
+    "srcfile": "server.R",
+    "type": "observer",
+    "prevId": "",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0319
+  },
+  {
+    "action": "invalidate",
+    "id": "3",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0331
+  },
+  {
+    "action": "ctx",
+    "id": "4",
+    "label": "output$caption",
+    "srcref": [
+      34,
+      32,
+      35,
+      17,
+      32,
+      17
+    ],
+    "srcfile": "server.R",
+    "type": "observer",
+    "prevId": "1",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0345
+  },
+  {
+    "action": "enter",
+    "id": "4",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0357
+  },
+  {
+    "action": "dep",
+    "id": "4",
+    "dependsOn": "input$caption",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0373
+  },
+  {
+    "action": "exit",
+    "id": "4",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0395
+  },
+  {
+    "action": "ctx",
+    "id": "5",
+    "label": "output$summary",
+    "srcref": [
+      42,
+      33,
+      44,
+      20,
+      33,
+      20
+    ],
+    "srcfile": "server.R",
+    "type": "observer",
+    "prevId": "2",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0405
+  },
+  {
+    "action": "enter",
+    "id": "5",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0416
+  },
+  {
+    "action": "ctx",
+    "id": "6",
+    "label": "datasetInput",
+    "srcref": [
+      16,
+      5,
+      19,
+      25,
+      5,
+      25,
+      16,
+      19
+    ],
+    "srcfile": "server.R",
+    "type": "observable",
+    "prevId": "",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0436
+  },
+  {
+    "action": "enter",
+    "id": "6",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0447
+  },
+  {
+    "action": "dep",
+    "id": "6",
+    "dependsOn": "input$dataset",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0455
+  },
+  {
+    "action": "exit",
+    "id": "6",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0478
+  },
+  {
+    "action": "depId",
+    "id": "5",
+    "dependsOn": "6",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0487
+  },
+  {
+    "action": "exit",
+    "id": "5",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0552
+  },
+  {
+    "action": "ctx",
+    "id": "7",
+    "label": "output$view",
+    "srcref": [
+      50,
+      30,
+      51,
+      39,
+      30,
+      39
+    ],
+    "srcfile": "server.R",
+    "type": "observer",
+    "prevId": "3",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0562
+  },
+  {
+    "action": "enter",
+    "id": "7",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0574
+  },
+  {
+    "action": "depId",
+    "id": "7",
+    "dependsOn": "6",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0589
+  },
+  {
+    "action": "dep",
+    "id": "7",
+    "dependsOn": "input$obs",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.0598
+  },
+  {
+    "action": "exit",
+    "id": "7",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212775.069
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:3] \"caption\" \"dataset\" \"obs\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212777.7149
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 3\n $ caption: chr \"Data Summary 1\"\n $ obs    : int 10\n $ dataset: chr \"rock\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212777.7181
+  },
+  {
+    "action": "valueChange",
+    "id": "input$caption",
+    "value": " chr \"Data Summary 1\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212777.7198
+  },
+  {
+    "action": "invalidate",
+    "id": "4",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212777.7208
+  },
+  {
+    "action": "ctx",
+    "id": "8",
+    "label": "output$caption",
+    "srcref": [
+      34,
+      32,
+      35,
+      17,
+      32,
+      17
+    ],
+    "srcfile": "server.R",
+    "type": "observer",
+    "prevId": "4",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212777.7236
+  },
+  {
+    "action": "enter",
+    "id": "8",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212777.7249
+  },
+  {
+    "action": "dep",
+    "id": "8",
+    "dependsOn": "input$caption",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212777.7266
+  },
+  {
+    "action": "exit",
+    "id": "8",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212777.7284
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:3] \"caption\" \"dataset\" \"obs\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212779.4006
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 3\n $ caption: chr \"Data Summary 1\"\n $ obs    : int 10\n $ dataset: chr \"pressure\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212779.4035
+  },
+  {
+    "action": "valueChange",
+    "id": "input$dataset",
+    "value": " chr \"pressure\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212779.4049
+  },
+  {
+    "action": "invalidate",
+    "id": "6",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212779.4058
+  },
+  {
+    "action": "invalidate",
+    "id": "5",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212779.4065
+  },
+  {
+    "action": "invalidate",
+    "id": "7",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212779.4089
+  },
+  {
+    "action": "ctx",
+    "id": "9",
+    "label": "output$summary",
+    "srcref": [
+      42,
+      33,
+      44,
+      20,
+      33,
+      20
+    ],
+    "srcfile": "server.R",
+    "type": "observer",
+    "prevId": "5",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212779.4109
+  },
+  {
+    "action": "enter",
+    "id": "9",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212779.412
+  },
+  {
+    "action": "ctx",
+    "id": "10",
+    "label": "datasetInput",
+    "srcref": [
+      16,
+      5,
+      19,
+      25,
+      5,
+      25,
+      16,
+      19
+    ],
+    "srcfile": "server.R",
+    "type": "observable",
+    "prevId": "6",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212779.4142
+  },
+  {
+    "action": "enter",
+    "id": "10",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212779.4153
+  },
+  {
+    "action": "dep",
+    "id": "10",
+    "dependsOn": "input$dataset",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212779.4161
+  },
+  {
+    "action": "exit",
+    "id": "10",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212779.4169
+  },
+  {
+    "action": "depId",
+    "id": "9",
+    "dependsOn": "10",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212779.4177
+  },
+  {
+    "action": "exit",
+    "id": "9",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212779.4777
+  },
+  {
+    "action": "ctx",
+    "id": "11",
+    "label": "output$view",
+    "srcref": [
+      50,
+      30,
+      51,
+      39,
+      30,
+      39
+    ],
+    "srcfile": "server.R",
+    "type": "observer",
+    "prevId": "7",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212779.4789
+  },
+  {
+    "action": "enter",
+    "id": "11",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212779.48
+  },
+  {
+    "action": "depId",
+    "id": "11",
+    "dependsOn": "10",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212779.4818
+  },
+  {
+    "action": "dep",
+    "id": "11",
+    "dependsOn": "input$obs",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212779.4827
+  },
+  {
+    "action": "exit",
+    "id": "11",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212779.4903
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:3] \"caption\" \"dataset\" \"obs\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212781.0019
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 3\n $ caption: chr \"Data Summary 1\"\n $ obs    : int 100\n $ dataset: chr \"pressure\"",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212781.0052
+  },
+  {
+    "action": "valueChange",
+    "id": "input$obs",
+    "value": " int 100",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212781.0069
+  },
+  {
+    "action": "invalidate",
+    "id": "11",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212781.008
+  },
+  {
+    "action": "ctx",
+    "id": "12",
+    "label": "output$view",
+    "srcref": [
+      50,
+      30,
+      51,
+      39,
+      30,
+      39
+    ],
+    "srcfile": "server.R",
+    "type": "observer",
+    "prevId": "11",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212781.0119
+  },
+  {
+    "action": "enter",
+    "id": "12",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212781.0132
+  },
+  {
+    "action": "depId",
+    "id": "12",
+    "dependsOn": "10",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212781.0155
+  },
+  {
+    "action": "dep",
+    "id": "12",
+    "dependsOn": "input$obs",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212781.0172
+  },
+  {
+    "action": "exit",
+    "id": "12",
+    "session": "36377b30e77d6f2f1f5fc5628b882ee5",
+    "time": 1449212781.0257
+  }
+];
+var time = true;
+try {
+  log = [
+  {
+    "action": "ctx",
+    "id": "1",
+    "label": "observeEvent(self$input[[\"._bookmark_\"]])",
+    "srcref": null,
+    "srcfile": null,
+    "type": "observer",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.71965
+  },
+  {
+    "action": "invalidate",
+    "id": "1",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.72661
+  },
+  {
+    "action": "ctx",
+    "id": "2",
+    "label": "observe({\n    rc <- getCurrentRestoreContext()\n    if (!is.null(rc$initErrorMessage)) {\n        showNotification(paste(\"Error in RestoreContext initialization:\", \n            rc$initErrorMessage), duration = NULL, type = \"error\")\n    }\n})",
+    "srcref": null,
+    "srcfile": null,
+    "type": "observer",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.74324
+  },
+  {
+    "action": "invalidate",
+    "id": "2",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.74336
+  },
+  {
+    "action": "ctx",
+    "id": "3",
+    "label": "observe({\n    if (private$restoreCallbacks$count() > 0) {\n        tryCatch(withLogErrors(isolate({\n            rc <- getCurrentRestoreContext()\n            if (rc$active) {\n                restoreState <- getCurrentRestoreContext()$asList()\n                private$restoreCallbacks$invoke(restoreState)\n            }\n        })), error = function(e) {\n            showNotification(paste0(\"Error calling onRestore callback: \", \n                e$message), duration = NULL, type = \"error\")\n        })\n    }\n})",
+    "srcref": null,
+    "srcfile": null,
+    "type": "observer",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.74524
+  },
+  {
+    "action": "invalidate",
+    "id": "3",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.74544
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr \"sidebarItemExpanded\"",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.75629
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 1\n $ sidebarItemExpanded: NULL",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.7571
+  },
+  {
+    "action": "valueChange",
+    "id": "input$sidebarItemExpanded",
+    "value": " NULL",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.75745
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:2] \"sidebarCollapsed\" \"sidebarItemExpanded\"",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.7739
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 2\n $ sidebarItemExpanded: NULL\n $ sidebarCollapsed   : logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.77535
+  },
+  {
+    "action": "valueChange",
+    "id": "input$sidebarCollapsed",
+    "value": " logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.77589
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:3] \"sidebarCollapsed\" \"sidebarItemExpanded\" \"tabs\"",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.77653
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 3\n $ sidebarItemExpanded: NULL\n $ tabs               : chr \"table\"\n $ sidebarCollapsed   : logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.77816
+  },
+  {
+    "action": "valueChange",
+    "id": "input$tabs",
+    "value": " chr \"table\"",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.77862
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:4] \"datafile-file\" \"sidebarCollapsed\" \"sidebarItemExpanded\" \"tabs\"",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.77924
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 4\n $ sidebarItemExpanded: NULL\n $ tabs               : chr \"table\"\n $ datafile-file      : NULL\n $ sidebarCollapsed   : logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.78102
+  },
+  {
+    "action": "valueChange",
+    "id": "input$datafile-file",
+    "value": " NULL",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.78138
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:5] \"._bookmark_\" \"datafile-file\" \"sidebarCollapsed\" \"sidebarItemExpanded\" \"tabs\"",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.78202
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 4\n $ sidebarItemExpanded: NULL\n $ tabs               : chr \"table\"\n $ datafile-file      : NULL\n $ sidebarCollapsed   : logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.78507
+  },
+  {
+    "action": "valueChange",
+    "id": "input$._bookmark_",
+    "value": "Classes 'integer', 'shinyActionButtonValue'  int 0",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.78639
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:6] \"._bookmark_\" \"datafile-file\" \"plot_width\" \"sidebarCollapsed\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.7874
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 5\n $ sidebarItemExpanded: NULL\n $ tabs               : chr \"table\"\n $ datafile-file      : NULL\n $ plot_width         : int 3\n $ sidebarCollapsed   : logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.78983
+  },
+  {
+    "action": "valueChange",
+    "id": "input$plot_width",
+    "value": " int 3",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.79039
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:7] \"._bookmark_\" \"datafile-file\" \"datafile-use_example\" \"plot_width\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.79108
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 6\n $ datafile-use_example: logi FALSE\n $ sidebarItemExpanded : NULL\n $ tabs                : chr \"table\"\n $ datafile-file       : NULL\n $ plot_width          : int 3\n $ sidebarCollapsed    : logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.79374
+  },
+  {
+    "action": "valueChange",
+    "id": "input$datafile-use_example",
+    "value": " logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.79435
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:8] \"._bookmark_\" \"datafile-file\" \"datafile-use_example\" \"plot_width\" \"shape\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.79509
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 7\n $ datafile-use_example: logi FALSE\n $ sidebarItemExpanded : NULL\n $ tabs                : chr \"table\"\n $ datafile-file       : NULL\n $ plot_width          : int 3\n $ shape               : num 0.1\n $ sidebarCollapsed    : logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.79826
+  },
+  {
+    "action": "valueChange",
+    "id": "input$shape",
+    "value": " num 0.1",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.79882
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr \"output_plot1_width\"",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.79974
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 1\n $ output_plot1_width: int 259",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.80188
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$output_plot1_width",
+    "value": " int 259",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.80276
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:2] \"output_plot1_height\" \"output_plot1_width\"",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.80348
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 2\n $ output_plot1_width : int 259\n $ output_plot1_height: int 650",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.8051
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$output_plot1_height",
+    "value": " int 650",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.80568
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:3] \"output_download1_hidden\" \"output_plot1_height\" \"output_plot1_width\"",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.80637
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 3\n $ output_plot1_width     : int 259\n $ output_plot1_height    : int 650\n $ output_download1_hidden: logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.80812
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$output_download1_hidden",
+    "value": " logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.80864
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:4] \"output_download1_hidden\" \"output_plot1_height\" \"output_plot1_width\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.8093
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 4\n $ output_sd-ui_slider_hidden: logi FALSE\n $ output_plot1_width        : int 259\n $ output_plot1_height       : int 650\n $ output_download1_hidden   : logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.81168
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$output_sd-ui_slider_hidden",
+    "value": " logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.81223
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:5] \"output_download1_hidden\" \"output_numberX-ui_slider_hidden\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.81294
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 5\n $ output_sd-ui_slider_hidden     : logi FALSE\n $ output_plot1_width             : int 259\n $ output_plot1_height            : int 650\n $ output_numberX-ui_slider_hidden: logi FALSE\n $ output_download1_hidden        : logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.81565
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$output_numberX-ui_slider_hidden",
+    "value": " logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.81672
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:6] \"output_download1_hidden\" \"output_numberX-ui_slider_hidden\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.81812
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 6\n $ output_sd-ui_slider_hidden     : logi FALSE\n $ output_plot1_width             : int 259\n $ output_plot1_height            : int 650\n $ output_sm-ui_select_hidden     : logi FALSE\n $ output_numberX-ui_slider_hidden: logi FALSE\n $ output_download1_hidden        : logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.82221
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$output_sm-ui_select_hidden",
+    "value": " logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.82281
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:7] \"output_download1_hidden\" \"output_numberX-ui_slider_hidden\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.82362
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 7\n $ output_sd-ui_slider_hidden       : logi FALSE\n $ output_plot1_width               : int 259\n $ output_plot1_height              : int 650\n $ output_sm-ui_select_hidden       : logi FALSE\n $ output_numberX-ui_slider_hidden  : logi FALSE\n $ output_download1_hidden          : logi FALSE\n $ output_sel_smoth-ui_select_hidden: logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.82772
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$output_sel_smoth-ui_select_hidden",
+    "value": " logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.82835
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:8] \"output_download1_hidden\" \"output_numberX-ui_slider_hidden\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.83571
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 8\n $ output_sd-ui_slider_hidden       : logi FALSE\n $ output_plot1_width               : int 259\n $ output_sm_buf_si-ui_slider_hidden: logi TRUE\n $ output_plot1_height              : int 650\n $ output_sm-ui_select_hidden       : logi FALSE\n $ output_numberX-ui_slider_hidden  : logi FALSE\n $ output_download1_hidden          : logi FALSE\n $ output_sel_smoth-ui_select_hidden: logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.84036
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$output_sm_buf_si-ui_slider_hidden",
+    "value": " logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.84092
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:9] \"output_download1_hidden\" \"output_numberX-ui_slider_hidden\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.84178
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 9\n $ output_sd-ui_slider_hidden               : logi FALSE\n $ output_plot1_width                       : int 259\n $ output_sm_buf_si-ui_slider_hidden        : logi TRUE\n $ output_plot1_height                      : int 650\n $ output_sm-ui_select_hidden               : logi FALSE\n $ output_numberX-ui_slider_hidden          : logi FALSE\n $ output_download1_hidden                  : logi FALSE\n $ output_sel_smoth-ui_select_hidden        : logi TRUE\n $ output_sm_buffer_number-ui_numeric_hidden: logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.84615
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$output_sm_buffer_number-ui_numeric_hidden",
+    "value": " logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.8467
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:10] \"output_download1_hidden\" \"output_numberX-ui_slider_hidden\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.84758
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 10\n $ output_sd-ui_slider_hidden               : logi FALSE\n $ output_plot1_width                       : int 259\n $ output_sm_buf_si-ui_slider_hidden        : logi TRUE\n $ output_plot1_height                      : int 650\n $ output_sm-ui_select_hidden               : logi FALSE\n $ output_numberX-ui_slider_hidden          : logi FALSE\n $ output_download1_hidden                  : logi FALSE\n $ output_sm_nSide-ui_slider_hidden         : logi TRUE\n $ output_sel_smoth-ui_select_hidden        : logi TRUE\n $ output_sm_buffer_number-ui_numeric_hidden: logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.85448
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$output_sm_nSide-ui_slider_hidden",
+    "value": " logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.85518
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:11] \"output_download1_hidden\" \"output_numberX-ui_slider_hidden\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.85616
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 11\n $ output_sd-ui_slider_hidden               : logi FALSE\n $ output_plot1_width                       : int 259\n $ output_sm_buf_si-ui_slider_hidden        : logi TRUE\n $ output_plot1_height                      : int 650\n $ output_sm-ui_select_hidden               : logi FALSE\n $ output_numberX-ui_slider_hidden          : logi FALSE\n $ output_download1_hidden                  : logi FALSE\n $ output_sm_rate-ui_numeric_hidden         : logi TRUE\n $ output_sm_nSide-ui_slider_hidden         : logi TRUE\n $ output_sel_smoth-ui_select_hidden        : logi TRUE\n $ output_sm_buffer_number-ui_numeric_hidden: logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.86149
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$output_sm_rate-ui_numeric_hidden",
+    "value": " logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.86206
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:12] \"output_alpha_bg-ui_slider_hidden\" \"output_download1_hidden\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.86303
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 12\n $ output_sd-ui_slider_hidden               : logi FALSE\n $ output_plot1_width                       : int 259\n $ output_sm_buf_si-ui_slider_hidden        : logi TRUE\n $ output_plot1_height                      : int 650\n $ output_sm-ui_select_hidden               : logi FALSE\n $ output_numberX-ui_slider_hidden          : logi FALSE\n $ output_download1_hidden                  : logi FALSE\n $ output_sm_rate-ui_numeric_hidden         : logi TRUE\n $ output_sm_nSide-ui_slider_hidden         : logi TRUE\n $ output_alpha_bg-ui_slider_hidden         : logi TRUE\n $ output_sel_smoth-ui_select_hidden        : logi TRUE\n $ output_sm_buffer_number-ui_numeric_hidden: logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.87117
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$output_alpha_bg-ui_slider_hidden",
+    "value": " logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.87174
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:13] \"output_alpha_bg-ui_slider_hidden\" \"output_download1_hidden\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.87272
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 13\n $ output_sd-ui_slider_hidden               : logi FALSE\n $ output_plot1_width                       : int 259\n $ output_plot1_hidden                      : logi FALSE\n $ output_sm_buf_si-ui_slider_hidden        : logi TRUE\n $ output_plot1_height                      : int 650\n $ output_sm-ui_select_hidden               : logi FALSE\n $ output_numberX-ui_slider_hidden          : logi FALSE\n $ output_download1_hidden                  : logi FALSE\n $ output_sm_rate-ui_numeric_hidden         : logi TRUE\n $ output_sm_nSide-ui_slider_hidden         : logi TRUE\n $ output_alpha_bg-ui_slider_hidden         : logi TRUE\n $ output_sel_smoth-ui_select_hidden        : logi TRUE\n $ output_sm_buffer_number-ui_numeric_hidden: logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.87888
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$output_plot1_hidden",
+    "value": " logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.87944
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:14] \"output_alpha_bg-ui_slider_hidden\" \"output_download1_hidden\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.88043
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 14\n $ output_sd-ui_slider_hidden               : logi FALSE\n $ output_plot1_width                       : int 259\n $ output_table1_hidden                     : logi FALSE\n $ output_plot1_hidden                      : logi FALSE\n $ output_sm_buf_si-ui_slider_hidden        : logi TRUE\n $ output_plot1_height                      : int 650\n $ output_sm-ui_select_hidden               : logi FALSE\n $ output_numberX-ui_slider_hidden          : logi FALSE\n $ output_download1_hidden                  : logi FALSE\n $ output_sm_rate-ui_numeric_hidden         : logi TRUE\n $ output_sm_nSide-ui_slider_hidden         : logi TRUE\n $ output_alpha_bg-ui_slider_hidden         : logi TRUE\n $ output_sel_smoth-ui_select_hidden        : logi TRUE\n $ output_sm_buffer_number-ui_numeric_hidden: logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.88892
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$output_table1_hidden",
+    "value": " logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.8895
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:15] \"output_alpha_bg-ui_slider_hidden\" \"output_download1_hidden\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.89056
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 15\n $ output_sd-ui_slider_hidden               : logi FALSE\n $ output_plot1_width                       : int 259\n $ output_table1_hidden                     : logi FALSE\n $ output_plot1_hidden                      : logi FALSE\n $ output_sm_buf_si-ui_slider_hidden        : logi TRUE\n $ output_plot1_height                      : int 650\n $ pixelratio                               : int 1\n $ output_sm-ui_select_hidden               : logi FALSE\n $ output_numberX-ui_slider_hidden          : logi FALSE\n $ output_download1_hidden                  : logi FALSE\n $ output_sm_rate-ui_numeric_hidden         : logi TRUE\n $ output_sm_nSide-ui_slider_hidden         : logi TRUE\n $ output_alpha_bg-ui_slider_hidden         : logi TRUE\n $ output_sel_smoth-ui_select_hidden        : logi TRUE\n $ output_sm_buffer_number-ui_numeric_hidden: logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.89767
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$pixelratio",
+    "value": " int 1",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.89825
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:16] \"output_alpha_bg-ui_slider_hidden\" \"output_download1_hidden\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.89944
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 16\n $ output_sd-ui_slider_hidden               : logi FALSE\n $ output_plot1_width                       : int 259\n $ output_table1_hidden                     : logi FALSE\n $ output_plot1_hidden                      : logi FALSE\n $ output_sm_buf_si-ui_slider_hidden        : logi TRUE\n $ output_plot1_height                      : int 650\n $ pixelratio                               : int 1\n $ output_sm-ui_select_hidden               : logi FALSE\n $ output_numberX-ui_slider_hidden          : logi FALSE\n $ output_download1_hidden                  : logi FALSE\n $ output_sm_rate-ui_numeric_hidden         : logi TRUE\n $ output_sm_nSide-ui_slider_hidden         : logi TRUE\n $ output_alpha_bg-ui_slider_hidden         : logi TRUE\n $ output_sel_smoth-ui_select_hidden        : logi TRUE\n $ url_protocol                             : chr \"http:\"\n $ output_sm_buffer_number-ui_numeric_hidden: logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.9097
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$url_protocol",
+    "value": " chr \"http:\"",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.91031
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:17] \"output_alpha_bg-ui_slider_hidden\" \"output_download1_hidden\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.91157
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 17\n $ output_sd-ui_slider_hidden               : logi FALSE\n $ output_plot1_width                       : int 259\n $ output_table1_hidden                     : logi FALSE\n $ output_plot1_hidden                      : logi FALSE\n $ output_sm_buf_si-ui_slider_hidden        : logi TRUE\n $ output_plot1_height                      : int 650\n $ pixelratio                               : int 1\n $ output_sm-ui_select_hidden               : logi FALSE\n $ output_numberX-ui_slider_hidden          : logi FALSE\n $ url_hostname                             : chr \"127.0.0.1\"\n $ output_download1_hidden                  : logi FALSE\n $ output_sm_rate-ui_numeric_hidden         : logi TRUE\n $ output_sm_nSide-ui_slider_hidden         : logi TRUE\n $ output_alpha_bg-ui_slider_hidden         : logi TRUE\n $ output_sel_smoth-ui_select_hidden        : logi TRUE\n $ url_protocol                             : chr \"http:\"\n $ output_sm_buffer_number-ui_numeric_hidden: logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.92162
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$url_hostname",
+    "value": " chr \"127.0.0.1\"",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.92216
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:18] \"output_alpha_bg-ui_slider_hidden\" \"output_download1_hidden\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.92327
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 18\n $ output_sd-ui_slider_hidden               : logi FALSE\n $ output_plot1_width                       : int 259\n $ output_table1_hidden                     : logi FALSE\n $ output_plot1_hidden                      : logi FALSE\n $ url_port                                 : chr \"4823\"\n $ output_sm_buf_si-ui_slider_hidden        : logi TRUE\n $ output_plot1_height                      : int 650\n $ pixelratio                               : int 1\n $ output_sm-ui_select_hidden               : logi FALSE\n $ output_numberX-ui_slider_hidden          : logi FALSE\n $ url_hostname                             : chr \"127.0.0.1\"\n $ output_download1_hidden                  : logi FALSE\n $ output_sm_rate-ui_numeric_hidden         : logi TRUE\n $ output_sm_nSide-ui_slider_hidden         : logi TRUE\n $ output_alpha_bg-ui_slider_hidden         : logi TRUE\n $ output_sel_smoth-ui_select_hidden        : logi TRUE\n $ url_protocol                             : chr \"http:\"\n $ output_sm_buffer_number-ui_numeric_hidden: logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.93164
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$url_port",
+    "value": " chr \"4823\"",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.93233
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:19] \"output_alpha_bg-ui_slider_hidden\" \"output_download1_hidden\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.93413
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 19\n $ url_pathname                             : chr \"/\"\n $ output_sd-ui_slider_hidden               : logi FALSE\n $ output_plot1_width                       : int 259\n $ output_table1_hidden                     : logi FALSE\n $ output_plot1_hidden                      : logi FALSE\n $ url_port                                 : chr \"4823\"\n $ output_sm_buf_si-ui_slider_hidden        : logi TRUE\n $ output_plot1_height                      : int 650\n $ pixelratio                               : int 1\n $ output_sm-ui_select_hidden               : logi FALSE\n $ output_numberX-ui_slider_hidden          : logi FALSE\n $ url_hostname                             : chr \"127.0.0.1\"\n $ output_download1_hidden                  : logi FALSE\n $ output_sm_rate-ui_numeric_hidden         : logi TRUE\n $ output_sm_nSide-ui_slider_hidden         : logi TRUE\n $ output_alpha_bg-ui_slider_hidden         : logi TRUE\n $ output_sel_smoth-ui_select_hidden        : logi TRUE\n $ url_protocol                             : chr \"http:\"\n $ output_sm_buffer_number-ui_numeric_hidden: logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.94479
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$url_pathname",
+    "value": " chr \"/\"",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.94532
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:20] \"output_alpha_bg-ui_slider_hidden\" \"output_download1_hidden\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.9465
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 20\n $ url_pathname                             : chr \"/\"\n $ output_sd-ui_slider_hidden               : logi FALSE\n $ output_plot1_width                       : int 259\n $ output_table1_hidden                     : logi FALSE\n $ output_plot1_hidden                      : logi FALSE\n $ url_port                                 : chr \"4823\"\n $ output_sm_buf_si-ui_slider_hidden        : logi TRUE\n $ output_plot1_height                      : int 650\n $ pixelratio                               : int 1\n $ output_sm-ui_select_hidden               : logi FALSE\n $ output_numberX-ui_slider_hidden          : logi FALSE\n $ url_hostname                             : chr \"127.0.0.1\"\n $ output_download1_hidden                  : logi FALSE\n $ url_search                               : chr \"\"\n $ output_sm_rate-ui_numeric_hidden         : logi TRUE\n $ output_sm_nSide-ui_slider_hidden         : logi TRUE\n $ output_alpha_bg-ui_slider_hidden         : logi TRUE\n $ output_sel_smoth-ui_select_hidden        : logi TRUE\n $ url_protocol                             : chr \"http:\"\n $ output_sm_buffer_number-ui_numeric_hidden: logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.95735
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$url_search",
+    "value": " chr \"\"",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.9579
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:21] \"output_alpha_bg-ui_slider_hidden\" \"output_download1_hidden\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.95903
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 21\n $ url_pathname                             : chr \"/\"\n $ output_sd-ui_slider_hidden               : logi FALSE\n $ output_plot1_width                       : int 259\n $ output_table1_hidden                     : logi FALSE\n $ output_plot1_hidden                      : logi FALSE\n $ url_port                                 : chr \"4823\"\n $ output_sm_buf_si-ui_slider_hidden        : logi TRUE\n $ output_plot1_height                      : int 650\n $ url_hash_initial                         : chr \"\"\n $ pixelratio                               : int 1\n $ output_sm-ui_select_hidden               : logi FALSE\n $ output_numberX-ui_slider_hidden          : logi FALSE\n $ url_hostname                             : chr \"127.0.0.1\"\n $ output_download1_hidden                  : logi FALSE\n $ url_search                               : chr \"\"\n $ output_sm_rate-ui_numeric_hidden         : logi TRUE\n $ output_sm_nSide-ui_slider_hidden         : logi TRUE\n $ output_alpha_bg-ui_slider_hidden         : logi TRUE\n $ output_sel_smoth-ui_select_hidden        : logi TRUE\n $ url_protocol                             : chr \"http:\"\n $ output_sm_buffer_number-ui_numeric_hidden: logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.97013
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$url_hash_initial",
+    "value": " chr \"\"",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.97068
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:22] \"output_alpha_bg-ui_slider_hidden\" \"output_download1_hidden\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.97186
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 22\n $ url_pathname                             : chr \"/\"\n $ output_sd-ui_slider_hidden               : logi FALSE\n $ output_plot1_width                       : int 259\n $ output_table1_hidden                     : logi FALSE\n $ output_plot1_hidden                      : logi FALSE\n $ url_port                                 : chr \"4823\"\n $ output_sm_buf_si-ui_slider_hidden        : logi TRUE\n $ output_plot1_height                      : int 650\n $ url_hash_initial                         : chr \"\"\n $ pixelratio                               : int 1\n $ output_sm-ui_select_hidden               : logi FALSE\n $ output_numberX-ui_slider_hidden          : logi FALSE\n $ url_hostname                             : chr \"127.0.0.1\"\n $ output_download1_hidden                  : logi FALSE\n $ url_search                               : chr \"\"\n $ output_sm_rate-ui_numeric_hidden         : logi TRUE\n $ output_sm_nSide-ui_slider_hidden         : logi TRUE\n $ output_alpha_bg-ui_slider_hidden         : logi TRUE\n $ output_sel_smoth-ui_select_hidden        : logi TRUE\n $ url_protocol                             : chr \"http:\"\n $ url_hash                                 : chr \"\"\n $ output_sm_buffer_number-ui_numeric_hidden: logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.9818
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$url_hash",
+    "value": " chr \"\"",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.98235
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:23] \"output_alpha_bg-ui_slider_hidden\" \"output_download1_hidden\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.98378
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 23\n $ url_pathname                             : chr \"/\"\n $ output_sd-ui_slider_hidden               : logi FALSE\n $ output_plot1_width                       : int 259\n $ output_table1_hidden                     : logi FALSE\n $ output_plot1_hidden                      : logi FALSE\n $ url_port                                 : chr \"4823\"\n $ output_sm_buf_si-ui_slider_hidden        : logi TRUE\n $ output_plot1_height                      : int 650\n $ url_hash_initial                         : chr \"\"\n $ pixelratio                               : int 1\n $ output_sm-ui_select_hidden               : logi FALSE\n $ singletons                               : chr \"\"\n $ output_numberX-ui_slider_hidden          : logi FALSE\n $ url_hostname                             : chr \"127.0.0.1\"\n $ output_download1_hidden                  : logi FALSE\n $ url_search                               : chr \"\"\n $ output_sm_rate-ui_numeric_hidden         : logi TRUE\n $ output_sm_nSide-ui_slider_hidden         : logi TRUE\n $ output_alpha_bg-ui_slider_hidden         : logi TRUE\n $ output_sel_smoth-ui_select_hidden        : logi TRUE\n $ url_protocol                             : chr \"http:\"\n $ url_hash                                 : chr \"\"\n $ output_sm_buffer_number-ui_numeric_hidden: logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.99401
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$singletons",
+    "value": " chr \"\"",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.99454
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:24] \"allowDataUriScheme\" \"output_alpha_bg-ui_slider_hidden\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365912.99567
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 24\n $ allowDataUriScheme                       : logi TRUE\n $ url_pathname                             : chr \"/\"\n $ output_sd-ui_slider_hidden               : logi FALSE\n $ output_plot1_width                       : int 259\n $ output_table1_hidden                     : logi FALSE\n $ output_plot1_hidden                      : logi FALSE\n $ url_port                                 : chr \"4823\"\n $ output_sm_buf_si-ui_slider_hidden        : logi TRUE\n $ output_plot1_height                      : int 650\n $ url_hash_initial                         : chr \"\"\n $ pixelratio                               : int 1\n $ output_sm-ui_select_hidden               : logi FALSE\n $ singletons                               : chr \"\"\n $ output_numberX-ui_slider_hidden          : logi FALSE\n $ url_hostname                             : chr \"127.0.0.1\"\n $ output_download1_hidden                  : logi FALSE\n $ url_search                               : chr \"\"\n $ output_sm_rate-ui_numeric_hidden         : logi TRUE\n $ output_sm_nSide-ui_slider_hidden         : logi TRUE\n $ output_alpha_bg-ui_slider_hidden         : logi TRUE\n $ output_sel_smoth-ui_select_hidden        : logi TRUE\n $ url_protocol                             : chr \"http:\"\n $ url_hash                                 : chr \"\"\n $ output_sm_buffer_number-ui_numeric_hidden: logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.00677
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$allowDataUriScheme",
+    "value": " logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.00735
+  },
+  {
+    "action": "ctx",
+    "id": "4",
+    "label": "output$table1",
+    "srcref": [192, 32, 193, 16, 32, 16],
+    "srcfile": "app.R",
+    "type": "observer",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.04615
+  },
+  {
+    "action": "invalidate",
+    "id": "4",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.04625
+  },
+  {
+    "action": "ctx",
+    "id": "5",
+    "label": "output$numberX-ui_slider",
+    "srcref": [11, 32, 25, 5, 32, 5],
+    "srcfile": "input_moduls.R",
+    "type": "observer",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.19962
+  },
+  {
+    "action": "invalidate",
+    "id": "5",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.19974
+  },
+  {
+    "action": "ctx",
+    "id": "6",
+    "label": "output$sd-ui_slider",
+    "srcref": [11, 32, 25, 5, 32, 5],
+    "srcfile": "input_moduls.R",
+    "type": "observer",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.21162
+  },
+  {
+    "action": "invalidate",
+    "id": "6",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.21177
+  },
+  {
+    "action": "ctx",
+    "id": "7",
+    "label": "output$sm-ui_select",
+    "srcref": [50, 32, 62, 5, 32, 5],
+    "srcfile": "input_moduls.R",
+    "type": "observer",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.25187
+  },
+  {
+    "action": "invalidate",
+    "id": "7",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.25202
+  },
+  {
+    "action": "ctx",
+    "id": "8",
+    "label": "output$alpha_bg-ui_slider",
+    "srcref": [11, 32, 25, 5, 32, 5],
+    "srcfile": "input_moduls.R",
+    "type": "observer",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.25957
+  },
+  {
+    "action": "invalidate",
+    "id": "8",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.25967
+  },
+  {
+    "action": "valueChange",
+    "id": "names(reactiveValues9293)",
+    "value": " chr \"width\"",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.26442
+  },
+  {
+    "action": "valueChange",
+    "id": "reactiveValues9293 (all)",
+    "value": "List of 1\n $ width: NULL",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.26534
+  },
+  {
+    "action": "valueChange",
+    "id": "reactiveValues9293$width",
+    "value": " NULL",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.26577
+  },
+  {
+    "action": "valueChange",
+    "id": "names(reactiveValues9293)",
+    "value": " chr [1:2] \"height\" \"width\"",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.26665
+  },
+  {
+    "action": "valueChange",
+    "id": "reactiveValues9293 (all)",
+    "value": "List of 2\n $ width : NULL\n $ height: NULL",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.2689
+  },
+  {
+    "action": "valueChange",
+    "id": "reactiveValues9293$height",
+    "value": " NULL",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.26964
+  },
+  {
+    "action": "ctx",
+    "id": "9",
+    "label": "output$plot1",
+    "srcref": [288, 36, 289, 15, 36, 15],
+    "srcfile": "app.R",
+    "type": "observer",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.27283
+  },
+  {
+    "action": "invalidate",
+    "id": "9",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.27293
+  },
+  {
+    "action": "ctx",
+    "id": "10",
+    "label": "observe({\n    if (private$restoreCallbacks$count() > 0) {\n        tryCatch(withLogErrors(isolate({\n            rc <- getCurrentRestoreContext()\n            if (rc$active) {\n                restoreState <- getCurrentRestoreContext()$asList()\n                private$restoreCallbacks$invoke(restoreState)\n            }\n        })), error = function(e) {\n            showNotification(paste0(\"Error calling onRestore callback: \", \n                e$message), duration = NULL, type = \"error\")\n        })\n    }\n})",
+    "srcref": null,
+    "srcfile": null,
+    "type": "observer",
+    "prevId": "3",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.35192
+  },
+  {
+    "action": "enter",
+    "id": "10",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.3523
+  },
+  {
+    "action": "ctx",
+    "id": "11",
+    "label": "[isolate]",
+    "srcref": null,
+    "srcfile": null,
+    "type": "isolate",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.35268
+  },
+  {
+    "action": "enter",
+    "id": "11",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.35285
+  },
+  {
+    "action": "exit",
+    "id": "11",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.35297
+  },
+  {
+    "action": "invalidate",
+    "id": "11",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.35304
+  },
+  {
+    "action": "exit",
+    "id": "10",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.35312
+  },
+  {
+    "action": "ctx",
+    "id": "12",
+    "label": "observeEvent(self$input[[\"._bookmark_\"]])",
+    "srcref": null,
+    "srcfile": null,
+    "type": "observer",
+    "prevId": "1",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.35356
+  },
+  {
+    "action": "enter",
+    "id": "12",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.35373
+  },
+  {
+    "action": "dep",
+    "id": "12",
+    "dependsOn": "input$._bookmark_",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.35398
+  },
+  {
+    "action": "exit",
+    "id": "12",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.35419
+  },
+  {
+    "action": "ctx",
+    "id": "13",
+    "label": "observe({\n    rc <- getCurrentRestoreContext()\n    if (!is.null(rc$initErrorMessage)) {\n        showNotification(paste(\"Error in RestoreContext initialization:\", \n            rc$initErrorMessage), duration = NULL, type = \"error\")\n    }\n})",
+    "srcref": null,
+    "srcfile": null,
+    "type": "observer",
+    "prevId": "2",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.35459
+  },
+  {
+    "action": "enter",
+    "id": "13",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.35475
+  },
+  {
+    "action": "exit",
+    "id": "13",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.35483
+  },
+  {
+    "action": "ctx",
+    "id": "14",
+    "label": "output$table1",
+    "srcref": [192, 32, 193, 16, 32, 16],
+    "srcfile": "app.R",
+    "type": "observer",
+    "prevId": "4",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.3552
+  },
+  {
+    "action": "enter",
+    "id": "14",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.35535
+  },
+  {
+    "action": "ctx",
+    "id": "15",
+    "label": "df_global1",
+    "srcref": [189, 5, 189, 24, 5, 24, 189, 189],
+    "srcfile": "app.R",
+    "type": "observable",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.35669
+  },
+  {
+    "action": "enter",
+    "id": "15",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.35689
+  },
+  {
+    "action": "ctx",
+    "id": "16",
+    "label": "dataframe",
+    "srcref": [23, 7, 27, 7, 7, 7, 23, 27],
+    "srcfile": "csv_import.R",
+    "type": "observable",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.35869
+  },
+  {
+    "action": "enter",
+    "id": "16",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.35894
+  },
+  {
+    "action": "dep",
+    "id": "16",
+    "dependsOn": "input$datafile-use_example",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.35916
+  },
+  {
+    "action": "ctx",
+    "id": "17",
+    "label": "userFile",
+    "srcref": [16, 5, 16, 125, 5, 125, 16, 16],
+    "srcfile": "csv_import.R",
+    "type": "observable",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.37749
+  },
+  {
+    "action": "enter",
+    "id": "17",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.37771
+  },
+  {
+    "action": "dep",
+    "id": "17",
+    "dependsOn": "input$datafile-file",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.37786
+  },
+  {
+    "action": "exit",
+    "id": "17",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.37882
+  },
+  {
+    "action": "exit",
+    "id": "16",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.37889
+  },
+  {
+    "action": "exit",
+    "id": "15",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.37895
+  },
+  {
+    "action": "exit",
+    "id": "14",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.38044
+  },
+  {
+    "action": "ctx",
+    "id": "18",
+    "label": "output$numberX-ui_slider",
+    "srcref": [11, 32, 25, 5, 32, 5],
+    "srcfile": "input_moduls.R",
+    "type": "observer",
+    "prevId": "5",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.38098
+  },
+  {
+    "action": "enter",
+    "id": "18",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.38118
+  },
+  {
+    "action": "ctx",
+    "id": "19",
+    "label": "pvars",
+    "srcref": [208, 5, 208, 22, 5, 22, 208, 208],
+    "srcfile": "app.R",
+    "type": "observable",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.38263
+  },
+  {
+    "action": "enter",
+    "id": "19",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.38283
+  },
+  {
+    "action": "ctx",
+    "id": "20",
+    "label": "df_global3",
+    "srcref": [203, 5, 203, 63, 5, 63, 203, 203],
+    "srcfile": "app.R",
+    "type": "observable",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.38308
+  },
+  {
+    "action": "enter",
+    "id": "20",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.38325
+  },
+  {
+    "action": "ctx",
+    "id": "21",
+    "label": "df_global2",
+    "srcref": [199, 5, 199, 61, 5, 61, 199, 199],
+    "srcfile": "app.R",
+    "type": "observable",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.38481
+  },
+  {
+    "action": "enter",
+    "id": "21",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.38502
+  },
+  {
+    "action": "depId",
+    "id": "21",
+    "dependsOn": "15",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.38538
+  },
+  {
+    "action": "exit",
+    "id": "21",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.38596
+  },
+  {
+    "action": "exit",
+    "id": "20",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.38602
+  },
+  {
+    "action": "exit",
+    "id": "19",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.38607
+  },
+  {
+    "action": "exit",
+    "id": "18",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.38776
+  },
+  {
+    "action": "ctx",
+    "id": "22",
+    "label": "output$sd-ui_slider",
+    "srcref": [11, 32, 25, 5, 32, 5],
+    "srcfile": "input_moduls.R",
+    "type": "observer",
+    "prevId": "6",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.38867
+  },
+  {
+    "action": "enter",
+    "id": "22",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.38903
+  },
+  {
+    "action": "depId",
+    "id": "22",
+    "dependsOn": "19",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.39028
+  },
+  {
+    "action": "exit",
+    "id": "22",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.39217
+  },
+  {
+    "action": "ctx",
+    "id": "23",
+    "label": "output$sm-ui_select",
+    "srcref": [50, 32, 62, 5, 32, 5],
+    "srcfile": "input_moduls.R",
+    "type": "observer",
+    "prevId": "7",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.39273
+  },
+  {
+    "action": "enter",
+    "id": "23",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.39294
+  },
+  {
+    "action": "depId",
+    "id": "23",
+    "dependsOn": "19",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.39457
+  },
+  {
+    "action": "exit",
+    "id": "23",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.39642
+  },
+  {
+    "action": "ctx",
+    "id": "24",
+    "label": "output$alpha_bg-ui_slider",
+    "srcref": [11, 32, 25, 5, 32, 5],
+    "srcfile": "input_moduls.R",
+    "type": "observer",
+    "prevId": "8",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.39696
+  },
+  {
+    "action": "enter",
+    "id": "24",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.39717
+  },
+  {
+    "action": "depId",
+    "id": "24",
+    "dependsOn": "19",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.39835
+  },
+  {
+    "action": "exit",
+    "id": "24",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.40027
+  },
+  {
+    "action": "ctx",
+    "id": "25",
+    "label": "output$plot1",
+    "srcref": [288, 36, 289, 15, 36, 15],
+    "srcfile": "app.R",
+    "type": "observer",
+    "prevId": "9",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.40085
+  },
+  {
+    "action": "enter",
+    "id": "25",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.40105
+  },
+  {
+    "action": "ctx",
+    "id": "26",
+    "label": "[isolate]",
+    "srcref": null,
+    "srcfile": null,
+    "type": "isolate",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.40236
+  },
+  {
+    "action": "enter",
+    "id": "26",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.40253
+  },
+  {
+    "action": "dep",
+    "id": "26",
+    "dependsOn": "clientData$output_plot1_width",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.40266
+  },
+  {
+    "action": "dep",
+    "id": "26",
+    "dependsOn": "clientData$output_plot1_height",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.40278
+  },
+  {
+    "action": "valueChange",
+    "id": "names(reactiveValues9293)",
+    "value": " chr [1:2] \"height\" \"width\"",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.4036
+  },
+  {
+    "action": "valueChange",
+    "id": "reactiveValues9293 (all)",
+    "value": "List of 2\n $ width : num 278\n $ height: NULL",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.40509
+  },
+  {
+    "action": "valueChange",
+    "id": "reactiveValues9293$width",
+    "value": " num 278",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.40578
+  },
+  {
+    "action": "valueChange",
+    "id": "names(reactiveValues9293)",
+    "value": " chr [1:2] \"height\" \"width\"",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.40654
+  },
+  {
+    "action": "valueChange",
+    "id": "reactiveValues9293 (all)",
+    "value": "List of 2\n $ width : num 278\n $ height: num 692",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.40813
+  },
+  {
+    "action": "valueChange",
+    "id": "reactiveValues9293$height",
+    "value": " num 692",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.40877
+  },
+  {
+    "action": "exit",
+    "id": "26",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.4089
+  },
+  {
+    "action": "invalidate",
+    "id": "26",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.40897
+  },
+  {
+    "action": "ctx",
+    "id": "27",
+    "label": "observe(doResizeCheck())",
+    "srcref": null,
+    "srcfile": null,
+    "type": "observer",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.4098
+  },
+  {
+    "action": "invalidate",
+    "id": "27",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.40989
+  },
+  {
+    "action": "ctx",
+    "id": "28",
+    "label": "userCacheKey",
+    "srcref": null,
+    "srcfile": "",
+    "type": "observable",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.41037
+  },
+  {
+    "action": "enter",
+    "id": "28",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.41055
+  },
+  {
+    "action": "ctx",
+    "id": "29",
+    "label": "print_plot1",
+    "srcref": [283, 5, 286, 5, 5, 5, 283, 286],
+    "srcfile": "app.R",
+    "type": "observable",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.41079
+  },
+  {
+    "action": "enter",
+    "id": "29",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.41098
+  },
+  {
+    "action": "ctx",
+    "id": "30",
+    "label": "shape_mod_print",
+    "srcref": [258, 5, 264, 5, 5, 5, 258, 264],
+    "srcfile": "app.R",
+    "type": "observable",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.41134
+  },
+  {
+    "action": "enter",
+    "id": "30",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.4115
+  },
+  {
+    "action": "depId",
+    "id": "30",
+    "dependsOn": "21",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.41216
+  },
+  {
+    "action": "exit",
+    "id": "30",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.41273
+  },
+  {
+    "action": "exit",
+    "id": "29",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.41279
+  },
+  {
+    "action": "exit",
+    "id": "28",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.41283
+  },
+  {
+    "action": "exit",
+    "id": "25",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.41435
+  },
+  {
+    "action": "ctx",
+    "id": "31",
+    "label": "observe(doResizeCheck())",
+    "srcref": null,
+    "srcfile": null,
+    "type": "observer",
+    "prevId": "27",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.41495
+  },
+  {
+    "action": "enter",
+    "id": "31",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.41516
+  },
+  {
+    "action": "dep",
+    "id": "31",
+    "dependsOn": "clientData$output_plot1_width",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.4153
+  },
+  {
+    "action": "dep",
+    "id": "31",
+    "dependsOn": "clientData$output_plot1_height",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.41543
+  },
+  {
+    "action": "exit",
+    "id": "31",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.41563
+  },
+  {
+    "action": "ctx",
+    "id": "32",
+    "label": "[isolate]",
+    "srcref": null,
+    "srcfile": null,
+    "type": "isolate",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.41993
+  },
+  {
+    "action": "enter",
+    "id": "32",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.42022
+  },
+  {
+    "action": "exit",
+    "id": "32",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.42036
+  },
+  {
+    "action": "invalidate",
+    "id": "32",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365913.42047
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:24] \"allowDataUriScheme\" \"output_alpha_bg-ui_slider_hidden\" ...",
+    "session": null,
+    "time": 1551365913.43265
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 24\n $ allowDataUriScheme                       : logi TRUE\n $ url_pathname                             : chr \"/\"\n $ output_sd-ui_slider_hidden               : logi FALSE\n $ output_plot1_width                       : int 259\n $ output_table1_hidden                     : logi FALSE\n $ output_plot1_hidden                      : logi FALSE\n $ url_port                                 : chr \"4823\"\n $ output_sm_buf_si-ui_slider_hidden        : logi TRUE\n $ output_plot1_height                      : int 650\n $ url_hash_initial                         : chr \"\"\n $ pixelratio                               : int 1\n $ output_sm-ui_select_hidden               : logi FALSE\n $ singletons                               : chr \"\"\n $ output_numberX-ui_slider_hidden          : logi FALSE\n $ url_hostname                             : chr \"127.0.0.1\"\n $ output_download1_hidden                  : logi TRUE\n $ url_search                               : chr \"\"\n $ output_sm_rate-ui_numeric_hidden         : logi TRUE\n $ output_sm_nSide-ui_slider_hidden         : logi TRUE\n $ output_alpha_bg-ui_slider_hidden         : logi TRUE\n $ output_sel_smoth-ui_select_hidden        : logi TRUE\n $ url_protocol                             : chr \"http:\"\n $ url_hash                                 : chr \"\"\n $ output_sm_buffer_number-ui_numeric_hidden: logi TRUE",
+    "session": null,
+    "time": 1551365913.44518
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$output_download1_hidden",
+    "value": " logi TRUE",
+    "session": null,
+    "time": 1551365913.44584
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:8] \"._bookmark_\" \"datafile-file\" \"datafile-use_example\" \"plot_width\" \"shape\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.36752
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 7\n $ datafile-use_example: logi TRUE\n $ sidebarItemExpanded : NULL\n $ tabs                : chr \"table\"\n $ datafile-file       : NULL\n $ plot_width          : int 3\n $ shape               : num 0.1\n $ sidebarCollapsed    : logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.3711
+  },
+  {
+    "action": "valueChange",
+    "id": "input$datafile-use_example",
+    "value": " logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.37169
+  },
+  {
+    "action": "invalidate",
+    "id": "16",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.37187
+  },
+  {
+    "action": "invalidate",
+    "id": "15",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.37198
+  },
+  {
+    "action": "invalidate",
+    "id": "21",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.37207
+  },
+  {
+    "action": "invalidate",
+    "id": "20",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.37216
+  },
+  {
+    "action": "invalidate",
+    "id": "19",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.37225
+  },
+  {
+    "action": "invalidate",
+    "id": "22",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.37234
+  },
+  {
+    "action": "invalidate",
+    "id": "23",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.37393
+  },
+  {
+    "action": "invalidate",
+    "id": "24",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.37497
+  },
+  {
+    "action": "invalidate",
+    "id": "18",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.3761
+  },
+  {
+    "action": "invalidate",
+    "id": "30",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.37723
+  },
+  {
+    "action": "invalidate",
+    "id": "29",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.37734
+  },
+  {
+    "action": "invalidate",
+    "id": "28",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.37743
+  },
+  {
+    "action": "invalidate",
+    "id": "25",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.37752
+  },
+  {
+    "action": "invalidate",
+    "id": "14",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.37871
+  },
+  {
+    "action": "ctx",
+    "id": "33",
+    "label": "output$sd-ui_slider",
+    "srcref": [11, 32, 25, 5, 32, 5],
+    "srcfile": "input_moduls.R",
+    "type": "observer",
+    "prevId": "22",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.38066
+  },
+  {
+    "action": "enter",
+    "id": "33",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.38089
+  },
+  {
+    "action": "ctx",
+    "id": "34",
+    "label": "pvars",
+    "srcref": [208, 5, 208, 22, 5, 22, 208, 208],
+    "srcfile": "app.R",
+    "type": "observable",
+    "prevId": "19",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.42845
+  },
+  {
+    "action": "enter",
+    "id": "34",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.42866
+  },
+  {
+    "action": "ctx",
+    "id": "35",
+    "label": "df_global3",
+    "srcref": [203, 5, 203, 63, 5, 63, 203, 203],
+    "srcfile": "app.R",
+    "type": "observable",
+    "prevId": "20",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.42891
+  },
+  {
+    "action": "enter",
+    "id": "35",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.42906
+  },
+  {
+    "action": "ctx",
+    "id": "36",
+    "label": "df_global2",
+    "srcref": [199, 5, 199, 61, 5, 61, 199, 199],
+    "srcfile": "app.R",
+    "type": "observable",
+    "prevId": "21",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.42973
+  },
+  {
+    "action": "enter",
+    "id": "36",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.42989
+  },
+  {
+    "action": "ctx",
+    "id": "37",
+    "label": "df_global1",
+    "srcref": [189, 5, 189, 24, 5, 24, 189, 189],
+    "srcfile": "app.R",
+    "type": "observable",
+    "prevId": "15",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.46896
+  },
+  {
+    "action": "enter",
+    "id": "37",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.46924
+  },
+  {
+    "action": "ctx",
+    "id": "38",
+    "label": "dataframe",
+    "srcref": [23, 7, 27, 7, 7, 7, 23, 27],
+    "srcfile": "csv_import.R",
+    "type": "observable",
+    "prevId": "16",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.49461
+  },
+  {
+    "action": "enter",
+    "id": "38",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.49486
+  },
+  {
+    "action": "dep",
+    "id": "38",
+    "dependsOn": "input$datafile-use_example",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.49501
+  },
+  {
+    "action": "exit",
+    "id": "38",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.49513
+  },
+  {
+    "action": "depId",
+    "id": "37",
+    "dependsOn": "38",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.4952
+  },
+  {
+    "action": "exit",
+    "id": "37",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.74228
+  },
+  {
+    "action": "depId",
+    "id": "36",
+    "dependsOn": "37",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.74236
+  },
+  {
+    "action": "dep",
+    "id": "36",
+    "dependsOn": "input$plot_width",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.74257
+  },
+  {
+    "action": "exit",
+    "id": "36",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.80557
+  },
+  {
+    "action": "depId",
+    "id": "35",
+    "dependsOn": "36",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365919.80564
+  },
+  {
+    "action": "depId",
+    "id": "35",
+    "dependsOn": "37",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.05981
+  },
+  {
+    "action": "exit",
+    "id": "35",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.07376
+  },
+  {
+    "action": "depId",
+    "id": "34",
+    "dependsOn": "35",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.07386
+  },
+  {
+    "action": "exit",
+    "id": "34",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.07396
+  },
+  {
+    "action": "depId",
+    "id": "33",
+    "dependsOn": "34",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.07405
+  },
+  {
+    "action": "depId",
+    "id": "33",
+    "dependsOn": "34",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.13645
+  },
+  {
+    "action": "depId",
+    "id": "33",
+    "dependsOn": "34",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.13656
+  },
+  {
+    "action": "ctx",
+    "id": "39",
+    "label": "y_vals",
+    "srcref": [213, 5, 213, 30, 5, 30, 213, 213],
+    "srcfile": "app.R",
+    "type": "observable",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.13691
+  },
+  {
+    "action": "enter",
+    "id": "39",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.13734
+  },
+  {
+    "action": "depId",
+    "id": "39",
+    "dependsOn": "35",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.13778
+  },
+  {
+    "action": "exit",
+    "id": "39",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.17918
+  },
+  {
+    "action": "depId",
+    "id": "33",
+    "dependsOn": "39",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.17926
+  },
+  {
+    "action": "depId",
+    "id": "33",
+    "dependsOn": "35",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.17953
+  },
+  {
+    "action": "depId",
+    "id": "33",
+    "dependsOn": "34",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.17974
+  },
+  {
+    "action": "exit",
+    "id": "33",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.19144
+  },
+  {
+    "action": "ctx",
+    "id": "40",
+    "label": "output$sm-ui_select",
+    "srcref": [50, 32, 62, 5, 32, 5],
+    "srcfile": "input_moduls.R",
+    "type": "observer",
+    "prevId": "23",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.19245
+  },
+  {
+    "action": "enter",
+    "id": "40",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.19291
+  },
+  {
+    "action": "depId",
+    "id": "40",
+    "dependsOn": "34",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.19547
+  },
+  {
+    "action": "depId",
+    "id": "40",
+    "dependsOn": "34",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.19583
+  },
+  {
+    "action": "depId",
+    "id": "40",
+    "dependsOn": "35",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.19616
+  },
+  {
+    "action": "exit",
+    "id": "40",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.20505
+  },
+  {
+    "action": "ctx",
+    "id": "41",
+    "label": "output$alpha_bg-ui_slider",
+    "srcref": [11, 32, 25, 5, 32, 5],
+    "srcfile": "input_moduls.R",
+    "type": "observer",
+    "prevId": "24",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.20581
+  },
+  {
+    "action": "enter",
+    "id": "41",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.2064
+  },
+  {
+    "action": "depId",
+    "id": "41",
+    "dependsOn": "34",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.20948
+  },
+  {
+    "action": "depId",
+    "id": "41",
+    "dependsOn": "34",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.2098
+  },
+  {
+    "action": "depId",
+    "id": "41",
+    "dependsOn": "34",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.20991
+  },
+  {
+    "action": "depId",
+    "id": "41",
+    "dependsOn": "34",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.21
+  },
+  {
+    "action": "depId",
+    "id": "41",
+    "dependsOn": "35",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.21034
+  },
+  {
+    "action": "depId",
+    "id": "41",
+    "dependsOn": "34",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.2105
+  },
+  {
+    "action": "exit",
+    "id": "41",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.22193
+  },
+  {
+    "action": "ctx",
+    "id": "42",
+    "label": "output$numberX-ui_slider",
+    "srcref": [11, 32, 25, 5, 32, 5],
+    "srcfile": "input_moduls.R",
+    "type": "observer",
+    "prevId": "18",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.22257
+  },
+  {
+    "action": "enter",
+    "id": "42",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.22279
+  },
+  {
+    "action": "depId",
+    "id": "42",
+    "dependsOn": "34",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.22501
+  },
+  {
+    "action": "depId",
+    "id": "42",
+    "dependsOn": "34",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.22572
+  },
+  {
+    "action": "depId",
+    "id": "42",
+    "dependsOn": "34",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.22591
+  },
+  {
+    "action": "depId",
+    "id": "42",
+    "dependsOn": "34",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.22608
+  },
+  {
+    "action": "depId",
+    "id": "42",
+    "dependsOn": "35",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.22665
+  },
+  {
+    "action": "depId",
+    "id": "42",
+    "dependsOn": "34",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.22697
+  },
+  {
+    "action": "exit",
+    "id": "42",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.23738
+  },
+  {
+    "action": "ctx",
+    "id": "43",
+    "label": "output$plot1",
+    "srcref": [288, 36, 289, 15, 36, 15],
+    "srcfile": "app.R",
+    "type": "observer",
+    "prevId": "25",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.23818
+  },
+  {
+    "action": "enter",
+    "id": "43",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.23853
+  },
+  {
+    "action": "ctx",
+    "id": "44",
+    "label": "userCacheKey",
+    "srcref": null,
+    "srcfile": "",
+    "type": "observable",
+    "prevId": "28",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.27822
+  },
+  {
+    "action": "enter",
+    "id": "44",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.27859
+  },
+  {
+    "action": "ctx",
+    "id": "45",
+    "label": "print_plot1",
+    "srcref": [283, 5, 286, 5, 5, 5, 283, 286],
+    "srcfile": "app.R",
+    "type": "observable",
+    "prevId": "29",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.27909
+  },
+  {
+    "action": "enter",
+    "id": "45",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.27933
+  },
+  {
+    "action": "ctx",
+    "id": "46",
+    "label": "shape_mod_print",
+    "srcref": [258, 5, 264, 5, 5, 5, 258, 264],
+    "srcfile": "app.R",
+    "type": "observable",
+    "prevId": "30",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.27969
+  },
+  {
+    "action": "enter",
+    "id": "46",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.27999
+  },
+  {
+    "action": "depId",
+    "id": "46",
+    "dependsOn": "36",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.31145
+  },
+  {
+    "action": "depId",
+    "id": "46",
+    "dependsOn": "34",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.32842
+  },
+  {
+    "action": "ctx",
+    "id": "47",
+    "label": "reactive({\n    lapply(seq(pvars), function(i) {\n        req(input[[paste0(label[i])]])\n    })\n    sapply(seq(pvars), function(i) {\n        input[[paste0(label[i])]]\n    })\n})",
+    "srcref": [31, 5, 31, 68, 5, 68, 31, 31],
+    "srcfile": "input_moduls.R",
+    "type": "observable",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.32875
+  },
+  {
+    "action": "enter",
+    "id": "47",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.32896
+  },
+  {
+    "action": "dep",
+    "id": "47",
+    "dependsOn": "input$numberX-AhZ",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.32933
+  },
+  {
+    "action": "exit",
+    "id": "47",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.33017
+  },
+  {
+    "action": "exit",
+    "id": "46",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.33024
+  },
+  {
+    "action": "exit",
+    "id": "45",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.33029
+  },
+  {
+    "action": "exit",
+    "id": "44",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.33034
+  },
+  {
+    "action": "exit",
+    "id": "43",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.33177
+  },
+  {
+    "action": "ctx",
+    "id": "48",
+    "label": "output$table1",
+    "srcref": [192, 32, 193, 16, 32, 16],
+    "srcfile": "app.R",
+    "type": "observer",
+    "prevId": "14",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.33237
+  },
+  {
+    "action": "enter",
+    "id": "48",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.33256
+  },
+  {
+    "action": "depId",
+    "id": "48",
+    "dependsOn": "37",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.33403
+  },
+  {
+    "action": "exit",
+    "id": "48",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.38816
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:9] \"._bookmark_\" \"datafile-file\" \"datafile-use_example\" \"plot_width\" \"sd-AhZ\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.68202
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 8\n $ datafile-use_example: logi TRUE\n $ sidebarItemExpanded : NULL\n $ tabs                : chr \"table\"\n $ datafile-file       : NULL\n $ sd-AhZ              : int 0\n $ plot_width          : int 3\n $ shape               : num 0.1\n $ sidebarCollapsed    : logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.68972
+  },
+  {
+    "action": "valueChange",
+    "id": "input$sd-AhZ",
+    "value": " int 0",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.69094
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:10] \"._bookmark_\" \"datafile-file\" \"datafile-use_example\" \"plot_width\" \"sd-AhZ\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.69225
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 9\n $ datafile-use_example: logi TRUE\n $ sidebarItemExpanded : NULL\n $ tabs                : chr \"table\"\n $ datafile-file       : NULL\n $ sd-AhZ              : int 0\n $ sd-Bvh              : int 0\n $ plot_width          : int 3\n $ shape               : num 0.1\n $ sidebarCollapsed    : logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.69763
+  },
+  {
+    "action": "valueChange",
+    "id": "input$sd-Bvh",
+    "value": " int 0",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.69874
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:11] \"._bookmark_\" \"datafile-file\" \"datafile-use_example\" \"plot_width\" \"sd-AhZ\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.69969
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 10\n $ datafile-use_example: logi TRUE\n $ sidebarItemExpanded : NULL\n $ tabs                : chr \"table\"\n $ sd-BvCv             : int 0\n $ datafile-file       : NULL\n $ sd-AhZ              : int 0\n $ sd-Bvh              : int 0\n $ plot_width          : int 3\n $ shape               : num 0.1\n $ sidebarCollapsed    : logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.71211
+  },
+  {
+    "action": "valueChange",
+    "id": "input$sd-BvCv",
+    "value": " int 0",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.71275
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:12] \"alpha_bg-AhZ\" \"._bookmark_\" \"datafile-file\" \"datafile-use_example\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.71364
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 11\n $ datafile-use_example: logi TRUE\n $ sidebarItemExpanded : NULL\n $ tabs                : chr \"table\"\n $ sd-BvCv             : int 0\n $ datafile-file       : NULL\n $ alpha_bg-AhZ        : int 1\n $ sd-AhZ              : int 0\n $ sd-Bvh              : int 0\n $ plot_width          : int 3\n $ shape               : num 0.1\n $ sidebarCollapsed    : logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.71905
+  },
+  {
+    "action": "valueChange",
+    "id": "input$alpha_bg-AhZ",
+    "value": " int 1",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.71964
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:13] \"alpha_bg-AhZ\" \"alpha_bg-Bvh\" \"._bookmark_\" \"datafile-file\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.72043
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 12\n $ datafile-use_example: logi TRUE\n $ sidebarItemExpanded : NULL\n $ tabs                : chr \"table\"\n $ alpha_bg-Bvh        : int 1\n $ sd-BvCv             : int 0\n $ datafile-file       : NULL\n $ alpha_bg-AhZ        : int 1\n $ sd-AhZ              : int 0\n $ sd-Bvh              : int 0\n $ plot_width          : int 3\n $ shape               : num 0.1\n $ sidebarCollapsed    : logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.72553
+  },
+  {
+    "action": "valueChange",
+    "id": "input$alpha_bg-Bvh",
+    "value": " int 1",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.72608
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:14] \"alpha_bg-AhZ\" \"alpha_bg-BvCv\" \"alpha_bg-Bvh\" \"._bookmark_\" \"datafile-file\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.72696
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 13\n $ datafile-use_example: logi TRUE\n $ sidebarItemExpanded : NULL\n $ tabs                : chr \"table\"\n $ alpha_bg-BvCv       : int 1\n $ alpha_bg-Bvh        : int 1\n $ sd-BvCv             : int 0\n $ datafile-file       : NULL\n $ alpha_bg-AhZ        : int 1\n $ sd-AhZ              : int 0\n $ sd-Bvh              : int 0\n $ plot_width          : int 3\n $ shape               : num 0.1\n $ sidebarCollapsed    : logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.73292
+  },
+  {
+    "action": "valueChange",
+    "id": "input$alpha_bg-BvCv",
+    "value": " int 1",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.7336
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:15] \"alpha_bg-AhZ\" \"alpha_bg-BvCv\" \"alpha_bg-Bvh\" \"._bookmark_\" \"datafile-file\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.73463
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 14\n $ datafile-use_example: logi TRUE\n $ sidebarItemExpanded : NULL\n $ tabs                : chr \"table\"\n $ alpha_bg-BvCv       : int 1\n $ alpha_bg-Bvh        : int 1\n $ sd-BvCv             : int 0\n $ datafile-file       : NULL\n $ alpha_bg-AhZ        : int 1\n $ sd-AhZ              : int 0\n $ sd-Bvh              : int 0\n $ numberX-AhZ         : int 1\n $ plot_width          : int 3\n $ shape               : num 0.1\n $ sidebarCollapsed    : logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.74085
+  },
+  {
+    "action": "valueChange",
+    "id": "input$numberX-AhZ",
+    "value": " int 1",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.74141
+  },
+  {
+    "action": "invalidate",
+    "id": "47",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.74157
+  },
+  {
+    "action": "invalidate",
+    "id": "46",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.74168
+  },
+  {
+    "action": "invalidate",
+    "id": "45",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.74176
+  },
+  {
+    "action": "invalidate",
+    "id": "44",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.74185
+  },
+  {
+    "action": "invalidate",
+    "id": "43",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.74192
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:16] \"alpha_bg-AhZ\" \"alpha_bg-BvCv\" \"alpha_bg-Bvh\" \"._bookmark_\" \"datafile-file\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.7447
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 15\n $ datafile-use_example: logi TRUE\n $ sidebarItemExpanded : NULL\n $ tabs                : chr \"table\"\n $ alpha_bg-BvCv       : int 1\n $ alpha_bg-Bvh        : int 1\n $ sd-BvCv             : int 0\n $ datafile-file       : NULL\n $ alpha_bg-AhZ        : int 1\n $ sd-AhZ              : int 0\n $ sd-Bvh              : int 0\n $ numberX-AhZ         : int 1\n $ plot_width          : int 3\n $ shape               : num 0.1\n $ sidebarCollapsed    : logi FALSE\n $ numberX-Bvh         : int 1",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.75201
+  },
+  {
+    "action": "valueChange",
+    "id": "input$numberX-Bvh",
+    "value": " int 1",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.75258
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:17] \"alpha_bg-AhZ\" \"alpha_bg-BvCv\" \"alpha_bg-Bvh\" \"._bookmark_\" \"datafile-file\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.7534
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 16\n $ datafile-use_example: logi TRUE\n $ sidebarItemExpanded : NULL\n $ tabs                : chr \"table\"\n $ alpha_bg-BvCv       : int 1\n $ alpha_bg-Bvh        : int 1\n $ sd-BvCv             : int 0\n $ numberX-BvCv        : int 1\n $ datafile-file       : NULL\n $ alpha_bg-AhZ        : int 1\n $ sd-AhZ              : int 0\n $ sd-Bvh              : int 0\n $ numberX-AhZ         : int 1\n $ plot_width          : int 3\n $ shape               : num 0.1\n $ sidebarCollapsed    : logi FALSE\n $ numberX-Bvh         : int 1",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.7605
+  },
+  {
+    "action": "valueChange",
+    "id": "input$numberX-BvCv",
+    "value": " int 1",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.76111
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:18] \"alpha_bg-AhZ\" \"alpha_bg-BvCv\" \"alpha_bg-Bvh\" \"._bookmark_\" \"datafile-file\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.76194
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 17\n $ datafile-use_example: logi TRUE\n $ sidebarItemExpanded : NULL\n $ sm-AhZ              : logi TRUE\n $ tabs                : chr \"table\"\n $ alpha_bg-BvCv       : int 1\n $ alpha_bg-Bvh        : int 1\n $ sd-BvCv             : int 0\n $ numberX-BvCv        : int 1\n $ datafile-file       : NULL\n $ alpha_bg-AhZ        : int 1\n $ sd-AhZ              : int 0\n $ sd-Bvh              : int 0\n $ numberX-AhZ         : int 1\n $ plot_width          : int 3\n $ shape               : num 0.1\n $ sidebarCollapsed    : logi FALSE\n $ numberX-Bvh         : int 1",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.76961
+  },
+  {
+    "action": "valueChange",
+    "id": "input$sm-AhZ",
+    "value": " logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.77019
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:19] \"alpha_bg-AhZ\" \"alpha_bg-BvCv\" \"alpha_bg-Bvh\" \"._bookmark_\" \"datafile-file\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.77103
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 18\n $ datafile-use_example: logi TRUE\n $ sidebarItemExpanded : NULL\n $ sm-AhZ              : logi TRUE\n $ tabs                : chr \"table\"\n $ sm-Bvh              : logi TRUE\n $ alpha_bg-BvCv       : int 1\n $ alpha_bg-Bvh        : int 1\n $ sd-BvCv             : int 0\n $ numberX-BvCv        : int 1\n $ datafile-file       : NULL\n $ alpha_bg-AhZ        : int 1\n $ sd-AhZ              : int 0\n $ sd-Bvh              : int 0\n $ numberX-AhZ         : int 1\n $ plot_width          : int 3\n $ shape               : num 0.1\n $ sidebarCollapsed    : logi FALSE\n $ numberX-Bvh         : int 1",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.77879
+  },
+  {
+    "action": "valueChange",
+    "id": "input$sm-Bvh",
+    "value": " logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.77935
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:20] \"alpha_bg-AhZ\" \"alpha_bg-BvCv\" \"alpha_bg-Bvh\" \"._bookmark_\" \"datafile-file\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.78028
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 19\n $ datafile-use_example: logi TRUE\n $ sidebarItemExpanded : NULL\n $ sm-AhZ              : logi TRUE\n $ tabs                : chr \"table\"\n $ sm-Bvh              : logi TRUE\n $ alpha_bg-BvCv       : int 1\n $ alpha_bg-Bvh        : int 1\n $ sd-BvCv             : int 0\n $ numberX-BvCv        : int 1\n $ datafile-file       : NULL\n $ alpha_bg-AhZ        : int 1\n $ sd-AhZ              : int 0\n $ sm-BvCv             : logi TRUE\n $ sd-Bvh              : int 0\n $ numberX-AhZ         : int 1\n $ plot_width          : int 3\n $ shape               : num 0.1\n $ sidebarCollapsed    : logi FALSE\n $ numberX-Bvh         : int 1",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.789
+  },
+  {
+    "action": "valueChange",
+    "id": "input$sm-BvCv",
+    "value": " logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.78956
+  },
+  {
+    "action": "ctx",
+    "id": "49",
+    "label": "output$plot1",
+    "srcref": [288, 36, 289, 15, 36, 15],
+    "srcfile": "app.R",
+    "type": "observer",
+    "prevId": "43",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.79045
+  },
+  {
+    "action": "enter",
+    "id": "49",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.79063
+  },
+  {
+    "action": "ctx",
+    "id": "50",
+    "label": "userCacheKey",
+    "srcref": null,
+    "srcfile": "",
+    "type": "observable",
+    "prevId": "44",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.79195
+  },
+  {
+    "action": "enter",
+    "id": "50",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.79215
+  },
+  {
+    "action": "ctx",
+    "id": "51",
+    "label": "print_plot1",
+    "srcref": [283, 5, 286, 5, 5, 5, 283, 286],
+    "srcfile": "app.R",
+    "type": "observable",
+    "prevId": "45",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.79241
+  },
+  {
+    "action": "enter",
+    "id": "51",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.79259
+  },
+  {
+    "action": "ctx",
+    "id": "52",
+    "label": "shape_mod_print",
+    "srcref": [258, 5, 264, 5, 5, 5, 258, 264],
+    "srcfile": "app.R",
+    "type": "observable",
+    "prevId": "46",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.79283
+  },
+  {
+    "action": "enter",
+    "id": "52",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.79299
+  },
+  {
+    "action": "depId",
+    "id": "52",
+    "dependsOn": "36",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.79343
+  },
+  {
+    "action": "depId",
+    "id": "52",
+    "dependsOn": "34",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.79541
+  },
+  {
+    "action": "ctx",
+    "id": "53",
+    "label": "reactive({\n    lapply(seq(pvars), function(i) {\n        req(input[[paste0(label[i])]])\n    })\n    sapply(seq(pvars), function(i) {\n        input[[paste0(label[i])]]\n    })\n})",
+    "srcref": [31, 5, 31, 68, 5, 68, 31, 31],
+    "srcfile": "input_moduls.R",
+    "type": "observable",
+    "prevId": "47",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.79575
+  },
+  {
+    "action": "enter",
+    "id": "53",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.79595
+  },
+  {
+    "action": "dep",
+    "id": "53",
+    "dependsOn": "input$numberX-AhZ",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.80046
+  },
+  {
+    "action": "dep",
+    "id": "53",
+    "dependsOn": "input$numberX-Bvh",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.80069
+  },
+  {
+    "action": "dep",
+    "id": "53",
+    "dependsOn": "input$numberX-BvCv",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.80087
+  },
+  {
+    "action": "exit",
+    "id": "53",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.8013
+  },
+  {
+    "action": "depId",
+    "id": "52",
+    "dependsOn": "53",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.80141
+  },
+  {
+    "action": "ctx",
+    "id": "54",
+    "label": "reactive({\n    lapply(seq(pvars), function(i) {\n        req(input[[paste0(label[i])]])\n    })\n    sapply(seq(pvars), function(i) {\n        input[[paste0(label[i])]]\n    })\n})",
+    "srcref": [31, 5, 31, 68, 5, 68, 31, 31],
+    "srcfile": "input_moduls.R",
+    "type": "observable",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.80187
+  },
+  {
+    "action": "enter",
+    "id": "54",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.80208
+  },
+  {
+    "action": "dep",
+    "id": "54",
+    "dependsOn": "input$sd-AhZ",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.80233
+  },
+  {
+    "action": "dep",
+    "id": "54",
+    "dependsOn": "input$sd-Bvh",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.80262
+  },
+  {
+    "action": "dep",
+    "id": "54",
+    "dependsOn": "input$sd-BvCv",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.8029
+  },
+  {
+    "action": "exit",
+    "id": "54",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.80321
+  },
+  {
+    "action": "depId",
+    "id": "52",
+    "dependsOn": "54",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.80327
+  },
+  {
+    "action": "ctx",
+    "id": "55",
+    "label": "reactive({\n    if (any(unlist(lapply(seq(pvars), function(i) {\n        is.null(input[[paste0(label[i])]])\n    })))) {\n        return(NULL)\n    }\n    sapply(seq(pvars), function(i) {\n        input[[paste0(label[i])]]\n    })\n})",
+    "srcref": [70, 5, 82, 8, 5, 8, 70, 82],
+    "srcfile": "input_moduls.R",
+    "type": "observable",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.80349
+  },
+  {
+    "action": "enter",
+    "id": "55",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.80367
+  },
+  {
+    "action": "dep",
+    "id": "55",
+    "dependsOn": "input$sm-AhZ",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.80383
+  },
+  {
+    "action": "dep",
+    "id": "55",
+    "dependsOn": "input$sm-Bvh",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.80397
+  },
+  {
+    "action": "dep",
+    "id": "55",
+    "dependsOn": "input$sm-BvCv",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.80411
+  },
+  {
+    "action": "exit",
+    "id": "55",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.80443
+  },
+  {
+    "action": "depId",
+    "id": "52",
+    "dependsOn": "55",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.80448
+  },
+  {
+    "action": "depId",
+    "id": "52",
+    "dependsOn": "35",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365920.95621
+  },
+  {
+    "action": "exit",
+    "id": "52",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.01957
+  },
+  {
+    "action": "depId",
+    "id": "51",
+    "dependsOn": "52",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.01964
+  },
+  {
+    "action": "depId",
+    "id": "51",
+    "dependsOn": "52",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.02222
+  },
+  {
+    "action": "ctx",
+    "id": "56",
+    "label": "reactive({\n    lapply(seq(pvars), function(i) {\n        req(input[[paste0(label[i])]])\n    })\n    sapply(seq(pvars), function(i) {\n        input[[paste0(label[i])]]\n    })\n})",
+    "srcref": [31, 5, 31, 68, 5, 68, 31, 31],
+    "srcfile": "input_moduls.R",
+    "type": "observable",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.02257
+  },
+  {
+    "action": "enter",
+    "id": "56",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.02279
+  },
+  {
+    "action": "dep",
+    "id": "56",
+    "dependsOn": "input$alpha_bg-AhZ",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.02307
+  },
+  {
+    "action": "dep",
+    "id": "56",
+    "dependsOn": "input$alpha_bg-Bvh",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.02336
+  },
+  {
+    "action": "dep",
+    "id": "56",
+    "dependsOn": "input$alpha_bg-BvCv",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.02363
+  },
+  {
+    "action": "exit",
+    "id": "56",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.02406
+  },
+  {
+    "action": "depId",
+    "id": "51",
+    "dependsOn": "56",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.02413
+  },
+  {
+    "action": "exit",
+    "id": "51",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.04691
+  },
+  {
+    "action": "depId",
+    "id": "50",
+    "dependsOn": "51",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.04699
+  },
+  {
+    "action": "exit",
+    "id": "50",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.04706
+  },
+  {
+    "action": "depId",
+    "id": "49",
+    "dependsOn": "50",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.0471
+  },
+  {
+    "action": "dep",
+    "id": "49",
+    "dependsOn": "reactiveValues9293$width",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.04726
+  },
+  {
+    "action": "dep",
+    "id": "49",
+    "dependsOn": "reactiveValues9293$height",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.04738
+  },
+  {
+    "action": "dep",
+    "id": "49",
+    "dependsOn": "clientData$pixelratio",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.04749
+  },
+  {
+    "action": "ctx",
+    "id": "57",
+    "label": "plotObj",
+    "srcref": null,
+    "srcfile": "",
+    "type": "observable",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.08546
+  },
+  {
+    "action": "enter",
+    "id": "57",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.08566
+  },
+  {
+    "action": "depId",
+    "id": "57",
+    "dependsOn": "50",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.08586
+  },
+  {
+    "action": "ctx",
+    "id": "58",
+    "label": "[isolate]",
+    "srcref": null,
+    "srcfile": null,
+    "type": "isolate",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.08606
+  },
+  {
+    "action": "enter",
+    "id": "58",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.08625
+  },
+  {
+    "action": "dep",
+    "id": "58",
+    "dependsOn": "reactiveValues9293$width",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.08635
+  },
+  {
+    "action": "dep",
+    "id": "58",
+    "dependsOn": "reactiveValues9293$height",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.08646
+  },
+  {
+    "action": "exit",
+    "id": "58",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.08654
+  },
+  {
+    "action": "invalidate",
+    "id": "58",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.0866
+  },
+  {
+    "action": "dep",
+    "id": "57",
+    "dependsOn": "clientData$pixelratio",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.08678
+  },
+  {
+    "action": "ctx",
+    "id": "59",
+    "label": "[isolate]",
+    "srcref": null,
+    "srcfile": null,
+    "type": "isolate",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.12845
+  },
+  {
+    "action": "enter",
+    "id": "59",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.12862
+  },
+  {
+    "action": "depId",
+    "id": "59",
+    "dependsOn": "51",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.13039
+  },
+  {
+    "action": "depId",
+    "id": "59",
+    "dependsOn": "35",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.13207
+  },
+  {
+    "action": "depId",
+    "id": "59",
+    "dependsOn": "35",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.13301
+  },
+  {
+    "action": "depId",
+    "id": "59",
+    "dependsOn": "35",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.13326
+  },
+  {
+    "action": "exit",
+    "id": "59",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.19097
+  },
+  {
+    "action": "invalidate",
+    "id": "59",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365921.19105
+  },
+  {
+    "action": "exit",
+    "id": "57",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365922.32499
+  },
+  {
+    "action": "depId",
+    "id": "49",
+    "dependsOn": "57",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365922.32507
+  },
+  {
+    "action": "exit",
+    "id": "49",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365922.32742
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:20] \"alpha_bg-AhZ\" \"alpha_bg-BvCv\" \"alpha_bg-Bvh\" \"._bookmark_\" \"datafile-file\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365925.03639
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 19\n $ datafile-use_example: logi TRUE\n $ sidebarItemExpanded : NULL\n $ sm-AhZ              : logi TRUE\n $ tabs                : chr \"plot\"\n $ sm-Bvh              : logi TRUE\n $ alpha_bg-BvCv       : int 1\n $ alpha_bg-Bvh        : int 1\n $ sd-BvCv             : int 0\n $ numberX-BvCv        : int 1\n $ datafile-file       : NULL\n $ alpha_bg-AhZ        : int 1\n $ sd-AhZ              : int 0\n $ sm-BvCv             : logi TRUE\n $ sd-Bvh              : int 0\n $ numberX-AhZ         : int 1\n $ plot_width          : int 3\n $ shape               : num 0.1\n $ sidebarCollapsed    : logi FALSE\n $ numberX-Bvh         : int 1",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365925.05467
+  },
+  {
+    "action": "valueChange",
+    "id": "input$tabs",
+    "value": " chr \"plot\"",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365925.05634
+  },
+  {
+    "action": "valueChange",
+    "id": "names(clientData)",
+    "value": " chr [1:24] \"allowDataUriScheme\" \"output_alpha_bg-ui_slider_hidden\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365925.07246
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData (all)",
+    "value": "List of 24\n $ allowDataUriScheme                       : logi TRUE\n $ url_pathname                             : chr \"/\"\n $ output_sd-ui_slider_hidden               : logi FALSE\n $ output_plot1_width                       : int 259\n $ output_table1_hidden                     : logi FALSE\n $ output_plot1_hidden                      : logi FALSE\n $ url_port                                 : chr \"4823\"\n $ output_sm_buf_si-ui_slider_hidden        : logi TRUE\n $ output_plot1_height                      : int 650\n $ url_hash_initial                         : chr \"\"\n $ pixelratio                               : int 1\n $ output_sm-ui_select_hidden               : logi FALSE\n $ singletons                               : chr \"\"\n $ output_numberX-ui_slider_hidden          : logi FALSE\n $ url_hostname                             : chr \"127.0.0.1\"\n $ output_download1_hidden                  : logi FALSE\n $ url_search                               : chr \"\"\n $ output_sm_rate-ui_numeric_hidden         : logi TRUE\n $ output_sm_nSide-ui_slider_hidden         : logi TRUE\n $ output_alpha_bg-ui_slider_hidden         : logi TRUE\n $ output_sel_smoth-ui_select_hidden        : logi TRUE\n $ url_protocol                             : chr \"http:\"\n $ url_hash                                 : chr \"\"\n $ output_sm_buffer_number-ui_numeric_hidden: logi TRUE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365925.08394
+  },
+  {
+    "action": "valueChange",
+    "id": "clientData$output_download1_hidden",
+    "value": " logi FALSE",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365925.08457
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:20] \"alpha_bg-AhZ\" \"alpha_bg-BvCv\" \"alpha_bg-Bvh\" \"._bookmark_\" \"datafile-file\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.40668
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 19\n $ datafile-use_example: logi TRUE\n $ sidebarItemExpanded : NULL\n $ sm-AhZ              : logi TRUE\n $ tabs                : chr \"plot\"\n $ sm-Bvh              : logi TRUE\n $ alpha_bg-BvCv       : int 1\n $ alpha_bg-Bvh        : int 1\n $ sd-BvCv             : int 0\n $ numberX-BvCv        : int 6\n $ datafile-file       : NULL\n $ alpha_bg-AhZ        : int 1\n $ sd-AhZ              : int 0\n $ sm-BvCv             : logi TRUE\n $ sd-Bvh              : int 0\n $ numberX-AhZ         : int 1\n $ plot_width          : int 3\n $ shape               : num 0.1\n $ sidebarCollapsed    : logi FALSE\n $ numberX-Bvh         : int 1",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.42632
+  },
+  {
+    "action": "valueChange",
+    "id": "input$numberX-BvCv",
+    "value": " int 6",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.42725
+  },
+  {
+    "action": "invalidate",
+    "id": "53",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.42752
+  },
+  {
+    "action": "invalidate",
+    "id": "52",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.42769
+  },
+  {
+    "action": "invalidate",
+    "id": "51",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.42783
+  },
+  {
+    "action": "invalidate",
+    "id": "50",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.42797
+  },
+  {
+    "action": "invalidate",
+    "id": "57",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.4281
+  },
+  {
+    "action": "invalidate",
+    "id": "49",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.42824
+  },
+  {
+    "action": "ctx",
+    "id": "60",
+    "label": "output$plot1",
+    "srcref": [288, 36, 289, 15, 36, 15],
+    "srcfile": "app.R",
+    "type": "observer",
+    "prevId": "49",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.43396
+  },
+  {
+    "action": "enter",
+    "id": "60",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.4344
+  },
+  {
+    "action": "ctx",
+    "id": "61",
+    "label": "userCacheKey",
+    "srcref": null,
+    "srcfile": "",
+    "type": "observable",
+    "prevId": "50",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.43723
+  },
+  {
+    "action": "enter",
+    "id": "61",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.43763
+  },
+  {
+    "action": "ctx",
+    "id": "62",
+    "label": "print_plot1",
+    "srcref": [283, 5, 286, 5, 5, 5, 283, 286],
+    "srcfile": "app.R",
+    "type": "observable",
+    "prevId": "51",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.43808
+  },
+  {
+    "action": "enter",
+    "id": "62",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.43845
+  },
+  {
+    "action": "ctx",
+    "id": "63",
+    "label": "shape_mod_print",
+    "srcref": [258, 5, 264, 5, 5, 5, 258, 264],
+    "srcfile": "app.R",
+    "type": "observable",
+    "prevId": "52",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.43897
+  },
+  {
+    "action": "enter",
+    "id": "63",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.43934
+  },
+  {
+    "action": "depId",
+    "id": "63",
+    "dependsOn": "36",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.44032
+  },
+  {
+    "action": "depId",
+    "id": "63",
+    "dependsOn": "34",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.4449
+  },
+  {
+    "action": "ctx",
+    "id": "64",
+    "label": "reactive({\n    lapply(seq(pvars), function(i) {\n        req(input[[paste0(label[i])]])\n    })\n    sapply(seq(pvars), function(i) {\n        input[[paste0(label[i])]]\n    })\n})",
+    "srcref": [31, 5, 31, 68, 5, 68, 31, 31],
+    "srcfile": "input_moduls.R",
+    "type": "observable",
+    "prevId": "53",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.44551
+  },
+  {
+    "action": "enter",
+    "id": "64",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.4458
+  },
+  {
+    "action": "dep",
+    "id": "64",
+    "dependsOn": "input$numberX-AhZ",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.44609
+  },
+  {
+    "action": "dep",
+    "id": "64",
+    "dependsOn": "input$numberX-Bvh",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.44636
+  },
+  {
+    "action": "dep",
+    "id": "64",
+    "dependsOn": "input$numberX-BvCv",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.44659
+  },
+  {
+    "action": "exit",
+    "id": "64",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.44702
+  },
+  {
+    "action": "depId",
+    "id": "63",
+    "dependsOn": "64",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.44709
+  },
+  {
+    "action": "depId",
+    "id": "63",
+    "dependsOn": "54",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.44722
+  },
+  {
+    "action": "depId",
+    "id": "63",
+    "dependsOn": "55",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.44734
+  },
+  {
+    "action": "depId",
+    "id": "63",
+    "dependsOn": "35",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.51784
+  },
+  {
+    "action": "exit",
+    "id": "63",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.55523
+  },
+  {
+    "action": "depId",
+    "id": "62",
+    "dependsOn": "63",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.55531
+  },
+  {
+    "action": "depId",
+    "id": "62",
+    "dependsOn": "63",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.55604
+  },
+  {
+    "action": "depId",
+    "id": "62",
+    "dependsOn": "56",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.55617
+  },
+  {
+    "action": "exit",
+    "id": "62",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.55778
+  },
+  {
+    "action": "depId",
+    "id": "61",
+    "dependsOn": "62",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.55785
+  },
+  {
+    "action": "exit",
+    "id": "61",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.55792
+  },
+  {
+    "action": "depId",
+    "id": "60",
+    "dependsOn": "61",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.55797
+  },
+  {
+    "action": "dep",
+    "id": "60",
+    "dependsOn": "reactiveValues9293$width",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.55814
+  },
+  {
+    "action": "dep",
+    "id": "60",
+    "dependsOn": "reactiveValues9293$height",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.55826
+  },
+  {
+    "action": "dep",
+    "id": "60",
+    "dependsOn": "clientData$pixelratio",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.55837
+  },
+  {
+    "action": "ctx",
+    "id": "65",
+    "label": "plotObj",
+    "srcref": null,
+    "srcfile": "",
+    "type": "observable",
+    "prevId": "57",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.56168
+  },
+  {
+    "action": "enter",
+    "id": "65",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.56188
+  },
+  {
+    "action": "depId",
+    "id": "65",
+    "dependsOn": "61",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.57002
+  },
+  {
+    "action": "ctx",
+    "id": "66",
+    "label": "[isolate]",
+    "srcref": null,
+    "srcfile": null,
+    "type": "isolate",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.57039
+  },
+  {
+    "action": "enter",
+    "id": "66",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.57055
+  },
+  {
+    "action": "dep",
+    "id": "66",
+    "dependsOn": "reactiveValues9293$width",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.57066
+  },
+  {
+    "action": "dep",
+    "id": "66",
+    "dependsOn": "reactiveValues9293$height",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.57077
+  },
+  {
+    "action": "exit",
+    "id": "66",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.57086
+  },
+  {
+    "action": "invalidate",
+    "id": "66",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.57092
+  },
+  {
+    "action": "dep",
+    "id": "65",
+    "dependsOn": "clientData$pixelratio",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.5711
+  },
+  {
+    "action": "ctx",
+    "id": "67",
+    "label": "[isolate]",
+    "srcref": null,
+    "srcfile": null,
+    "type": "isolate",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.63431
+  },
+  {
+    "action": "enter",
+    "id": "67",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.6345
+  },
+  {
+    "action": "depId",
+    "id": "67",
+    "dependsOn": "62",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.63539
+  },
+  {
+    "action": "depId",
+    "id": "67",
+    "dependsOn": "35",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.63881
+  },
+  {
+    "action": "depId",
+    "id": "67",
+    "dependsOn": "35",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.63961
+  },
+  {
+    "action": "depId",
+    "id": "67",
+    "dependsOn": "35",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.63978
+  },
+  {
+    "action": "exit",
+    "id": "67",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.6726
+  },
+  {
+    "action": "invalidate",
+    "id": "67",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365935.67271
+  },
+  {
+    "action": "exit",
+    "id": "65",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365936.90201
+  },
+  {
+    "action": "depId",
+    "id": "60",
+    "dependsOn": "65",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365936.90214
+  },
+  {
+    "action": "exit",
+    "id": "60",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365936.99449
+  },
+  {
+    "action": "valueChange",
+    "id": "names(input)",
+    "value": " chr [1:20] \"alpha_bg-AhZ\" \"alpha_bg-BvCv\" \"alpha_bg-Bvh\" \"._bookmark_\" \"datafile-file\" ...",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.91418
+  },
+  {
+    "action": "valueChange",
+    "id": "input (all)",
+    "value": "List of 19\n $ datafile-use_example: logi TRUE\n $ sidebarItemExpanded : NULL\n $ sm-AhZ              : logi TRUE\n $ tabs                : chr \"plot\"\n $ sm-Bvh              : logi TRUE\n $ alpha_bg-BvCv       : int 1\n $ alpha_bg-Bvh        : int 1\n $ sd-BvCv             : num 0.9\n $ numberX-BvCv        : int 6\n $ datafile-file       : NULL\n $ alpha_bg-AhZ        : int 1\n $ sd-AhZ              : int 0\n $ sm-BvCv             : logi TRUE\n $ sd-Bvh              : int 0\n $ numberX-AhZ         : int 1\n $ plot_width          : int 3\n $ shape               : num 0.1\n $ sidebarCollapsed    : logi FALSE\n $ numberX-Bvh         : int 1",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.93429
+  },
+  {
+    "action": "valueChange",
+    "id": "input$sd-BvCv",
+    "value": " num 0.9",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.93556
+  },
+  {
+    "action": "invalidate",
+    "id": "54",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.93589
+  },
+  {
+    "action": "invalidate",
+    "id": "63",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.9361
+  },
+  {
+    "action": "invalidate",
+    "id": "62",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.93626
+  },
+  {
+    "action": "invalidate",
+    "id": "61",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.93643
+  },
+  {
+    "action": "invalidate",
+    "id": "60",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.93658
+  },
+  {
+    "action": "invalidate",
+    "id": "65",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.93977
+  },
+  {
+    "action": "ctx",
+    "id": "68",
+    "label": "output$plot1",
+    "srcref": [288, 36, 289, 15, 36, 15],
+    "srcfile": "app.R",
+    "type": "observer",
+    "prevId": "60",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.94227
+  },
+  {
+    "action": "enter",
+    "id": "68",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.94267
+  },
+  {
+    "action": "ctx",
+    "id": "69",
+    "label": "userCacheKey",
+    "srcref": null,
+    "srcfile": "",
+    "type": "observable",
+    "prevId": "61",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.9451
+  },
+  {
+    "action": "enter",
+    "id": "69",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.94554
+  },
+  {
+    "action": "ctx",
+    "id": "70",
+    "label": "print_plot1",
+    "srcref": [283, 5, 286, 5, 5, 5, 283, 286],
+    "srcfile": "app.R",
+    "type": "observable",
+    "prevId": "62",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.94606
+  },
+  {
+    "action": "enter",
+    "id": "70",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.9465
+  },
+  {
+    "action": "ctx",
+    "id": "71",
+    "label": "shape_mod_print",
+    "srcref": [258, 5, 264, 5, 5, 5, 258, 264],
+    "srcfile": "app.R",
+    "type": "observable",
+    "prevId": "63",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.94727
+  },
+  {
+    "action": "enter",
+    "id": "71",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.94779
+  },
+  {
+    "action": "depId",
+    "id": "71",
+    "dependsOn": "36",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.94857
+  },
+  {
+    "action": "depId",
+    "id": "71",
+    "dependsOn": "34",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.95235
+  },
+  {
+    "action": "depId",
+    "id": "71",
+    "dependsOn": "64",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.95258
+  },
+  {
+    "action": "ctx",
+    "id": "72",
+    "label": "reactive({\n    lapply(seq(pvars), function(i) {\n        req(input[[paste0(label[i])]])\n    })\n    sapply(seq(pvars), function(i) {\n        input[[paste0(label[i])]]\n    })\n})",
+    "srcref": [31, 5, 31, 68, 5, 68, 31, 31],
+    "srcfile": "input_moduls.R",
+    "type": "observable",
+    "prevId": "54",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.95306
+  },
+  {
+    "action": "enter",
+    "id": "72",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.95343
+  },
+  {
+    "action": "dep",
+    "id": "72",
+    "dependsOn": "input$sd-AhZ",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.95385
+  },
+  {
+    "action": "dep",
+    "id": "72",
+    "dependsOn": "input$sd-Bvh",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.95419
+  },
+  {
+    "action": "dep",
+    "id": "72",
+    "dependsOn": "input$sd-BvCv",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.95449
+  },
+  {
+    "action": "exit",
+    "id": "72",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.95504
+  },
+  {
+    "action": "depId",
+    "id": "71",
+    "dependsOn": "72",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.95515
+  },
+  {
+    "action": "depId",
+    "id": "71",
+    "dependsOn": "55",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365939.95532
+  },
+  {
+    "action": "depId",
+    "id": "71",
+    "dependsOn": "35",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.00435
+  },
+  {
+    "action": "exit",
+    "id": "71",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.02723
+  },
+  {
+    "action": "depId",
+    "id": "70",
+    "dependsOn": "71",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.02731
+  },
+  {
+    "action": "depId",
+    "id": "70",
+    "dependsOn": "71",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.02803
+  },
+  {
+    "action": "depId",
+    "id": "70",
+    "dependsOn": "56",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.02816
+  },
+  {
+    "action": "exit",
+    "id": "70",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.02993
+  },
+  {
+    "action": "depId",
+    "id": "69",
+    "dependsOn": "70",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.02999
+  },
+  {
+    "action": "exit",
+    "id": "69",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.03006
+  },
+  {
+    "action": "depId",
+    "id": "68",
+    "dependsOn": "69",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.03012
+  },
+  {
+    "action": "dep",
+    "id": "68",
+    "dependsOn": "reactiveValues9293$width",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.03027
+  },
+  {
+    "action": "dep",
+    "id": "68",
+    "dependsOn": "reactiveValues9293$height",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.03039
+  },
+  {
+    "action": "dep",
+    "id": "68",
+    "dependsOn": "clientData$pixelratio",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.03054
+  },
+  {
+    "action": "ctx",
+    "id": "73",
+    "label": "plotObj",
+    "srcref": null,
+    "srcfile": "",
+    "type": "observable",
+    "prevId": "65",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.03493
+  },
+  {
+    "action": "enter",
+    "id": "73",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.03516
+  },
+  {
+    "action": "depId",
+    "id": "73",
+    "dependsOn": "69",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.03537
+  },
+  {
+    "action": "ctx",
+    "id": "74",
+    "label": "[isolate]",
+    "srcref": null,
+    "srcfile": null,
+    "type": "isolate",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.03561
+  },
+  {
+    "action": "enter",
+    "id": "74",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.03577
+  },
+  {
+    "action": "dep",
+    "id": "74",
+    "dependsOn": "reactiveValues9293$width",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.03588
+  },
+  {
+    "action": "dep",
+    "id": "74",
+    "dependsOn": "reactiveValues9293$height",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.03599
+  },
+  {
+    "action": "exit",
+    "id": "74",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.03608
+  },
+  {
+    "action": "invalidate",
+    "id": "74",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.03614
+  },
+  {
+    "action": "dep",
+    "id": "73",
+    "dependsOn": "clientData$pixelratio",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.03633
+  },
+  {
+    "action": "ctx",
+    "id": "75",
+    "label": "[isolate]",
+    "srcref": null,
+    "srcfile": null,
+    "type": "isolate",
+    "prevId": "",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.03916
+  },
+  {
+    "action": "enter",
+    "id": "75",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.0437
+  },
+  {
+    "action": "depId",
+    "id": "75",
+    "dependsOn": "70",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.04486
+  },
+  {
+    "action": "depId",
+    "id": "75",
+    "dependsOn": "35",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.04587
+  },
+  {
+    "action": "depId",
+    "id": "75",
+    "dependsOn": "35",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.04669
+  },
+  {
+    "action": "depId",
+    "id": "75",
+    "dependsOn": "35",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.04686
+  },
+  {
+    "action": "exit",
+    "id": "75",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.05172
+  },
+  {
+    "action": "invalidate",
+    "id": "75",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.05182
+  },
+  {
+    "action": "exit",
+    "id": "73",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.31812
+  },
+  {
+    "action": "depId",
+    "id": "68",
+    "dependsOn": "73",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.31826
+  },
+  {
+    "action": "exit",
+    "id": "68",
+    "session": "66787c066a6213a3af6478b070bb98e4",
+    "time": 1551365940.3218
+  }
+];
+  time = String("TRUE").toLowerCase() === 'true';
+} catch (e) {}
+
+var nodes = {};
+var nodeList = [];
+var nodeSelection = null;
+var links = [];
+var linkSelection = null;
+
+var node, link;  // d3 selections
+
+var MAX_LINES = 6;
+
+var force = d3.layout.force()
+    .charge(-100)
+    .nodes(nodeList)
+    .links(links);
+force.on('tick', onTick);
+
+function pathDataForNode(node) {
+  switch (node.type) {
+    case 'observer':
+      return 'M -25,-50  c -75,0 -75,100 0,100  l 100,0  l 0,-100 Z';
+    case 'observable':
+      return 'M -25,-50  c -75,0 -75,100 0,100  l 60,0  l 50,-50  l -50,-50  Z';
+    case 'value':
+      return 'M -50,-50 l 0,100 l 100,0  l 50,-50  l -50,-50  Z';
+  }
+}
+
+function getSourceCoords(node) {
+  switch (node.type) {
+    case 'observer':
+    case 'observable':
+      return {x: node.x - 5, y: node.y};
+    default:
+      return {x: node.x, y: node.y};
+  }
+}
+
+function getTargetCoords(node) {
+  switch (node.type) {
+    case 'observable':
+      return {x: node.x + 7, y: node.y};
+    case 'value':
+      return {x: node.x + 8, y: node.y};
+    default:
+      return {x: node.x, y: node.y};
+  }
+}
+
+function compare(a, b) {
+  if (a.id < b.id)
+    return -1;
+  else if (a.id > b.id)
+    return 1;
+  else
+    return 0;
+}
+
+var timeDifferences = function() {
+  var enters = log.filter(function(obj) { return obj.action === 'enter' });
+  enters.sort(compare);
+  var exits = log.filter(function(obj) { return obj.action === 'exit' });
+  exits.sort(compare);
+  var diff = [];
+  for (var i = 0; i < exits.length; i++)
+    diff.push(exits[i].time - enters[i].time);
+  return diff.map(function(x) { return x * 1000; });
+}();
+
+// colors taken from colorbrewer's 9-class Reds: http://colorbrewer2.org/?type=sequential&scheme=Reds&n=9
+var colorScale = d3.scale.quantize()
+                         .domain([d3.min(timeDifferences), d3.max(timeDifferences)])
+                         .range(['#fcbba1','#fc9272','#fb6a4a','#ef3b2c','#cb181d','#a50f15']);
+
+function update() {
+  force.size([document.documentElement.clientWidth / 4,
+              document.documentElement.clientHeight / 4]);
+
+  var layoutDirty = false;
+
+  node = d3.select('#nodes').selectAll('.node').data(nodeList);
+  layoutDirty = layoutDirty || !node.enter().empty() || !node.exit().empty();
+  var newG = node.enter().append('g')
+      .attr('class', function(n) {return 'node ' + n.type;})
+      .attr('r', 5)
+      // don't show until next tick
+      .style('display', 'none')
+      .on('mousedown', function() {
+        d3.event.stopPropagation();
+      })
+      .on('mouseover', function(n) {
+        $('#description').text(n.label);
+      })
+      .on('mouseout', function(d, i) {
+        $('#description').text('');
+      })
+      .on('dblclick', function(d) {
+        d3.event.stopPropagation();
+        d3.select(this).classed('fixed', d.fixed = false);
+      })
+      .call(force.drag().on('dragstart', function(d) {
+        d3.select(this).classed('fixed', d.fixed = true);
+      }));
+  newG.append('path')
+      .attr('transform', 'scale(0.08)')
+      .attr('stroke', 'black')
+      .attr('stroke-width', 4)
+      .attr('fill', 'white')
+      .attr('d', pathDataForNode);
+  newG.append('text')
+      .attr('x', 3)
+      .attr('y', 1.5)
+      .attr('font-size', 3.25)
+      .attr('transform', function(n) {
+        if (n.type !== 'observer')
+          return 'translate(1.5, 0)';
+        else
+          return null;
+      })
+  node.exit().remove();
+  node
+      .classed('invalidated', function(n) { return n.invalidated; })
+      .classed('running', function(n) { return n.running; })
+      .classed('changed', function(n) { return n.changed; })
+      .attr('fill', function(n) {
+        if (n.invalidated)
+          return "url(#diagonalHatch)";
+        else
+          return null;
+      });
+  var tspanLabel = node.selectAll('text').filter(function(n) {
+    // This filter is used to disregard all nodes whose labels have
+    // not changed since the last time we updated them.
+    var changed = n.label !== this.label;
+    this.label = n.label;
+    return changed;
+  }).selectAll('.tspanLabel')
+    .data(function(n) {
+      var lines = n.label.replace(/ /g, '\xA0').split('\n');
+      if (lines.length > MAX_LINES) {
+        lines.splice(MAX_LINES);
+      }
+      return lines;
+    });
+  tspanLabel.enter().append('tspan');
+  tspanLabel.exit().remove();
+  tspanLabel
+      .attr('x', 8)
+      .attr('dy', function(line, i) { return i > 0 ? '1em' : 0})
+      .attr('opacity', function(line, i) {
+        return Math.min(1, (MAX_LINES - i) * 0.25 - 0.15);
+      })
+      .classed('tspanLabel', true)
+      .text(function(line) { return line; });
+
+  var tspanTime = node.selectAll('text').filter(function(n) {
+    var changed = n.timeElapsed !== this.timeElapsed;
+    this.timeElapsed = n.timeElapsed;
+    return changed;
+  }).selectAll('.tspanTime')
+    .data(function(n) {
+      return [n.timeElapsed];
+    });
+  tspanTime.enter().append('tspan');
+  tspanTime.exit().remove();
+  tspanTime
+      .attr('x', 8)
+      .attr('y', -2)
+      .attr('fill', function(time) { return colorScale(time); })
+      .classed('tspanTime', true)
+      .text(function(time) {
+        if (time === null) return '';
+        else return 'time elapsed: ' + (Math.round(time * 1000) / 1000) + ' ms';
+      });
+
+  link = d3.select('#links').selectAll('.link').data(links);
+  layoutDirty = layoutDirty || !link.enter().empty() || !link.exit().empty();
+  link.enter().append('path')
+      .attr('class', 'link')
+      .attr('marker-mid', 'url(#triangle)');
+  link.exit().remove();
+
+  if (layoutDirty) {
+    force
+      .nodes(nodeList.filter(function(n) {return !n.hide;}))
+      .start();
+    layoutDirty = false;
+  }
+}
+
+function onTick() {
+  node
+      .style('display', null)
+      .attr('transform', function(n) {
+        return 'translate(' + n.x + ' ' + n.y + ')';
+      });
+  link
+      .attr('d', function(link) {
+        var source = getSourceCoords(link.source);
+        var target = getTargetCoords(link.target)
+        var mid = {
+          x: (source.x + target.x) / 2,
+          y: (source.y + target.y) / 2
+        }
+        return 'M' + source.x + ',' + source.y +
+          ' L' + mid.x + ',' + mid.y +
+          ' L' + target.x + ',' + target.y;
+      });
+}
+
+function createNodeWithUndo(data) {
+  var node;
+  if (!data.prevId) {
+    node = {
+      label: data.label,
+      type: data.type,
+      hide: data.hide
+    };
+    nodes[data.id] = node;
+    pushUndo(function() {
+      delete nodes[data.id];
+    });
+    if (!node.hide) {
+      nodeList.push(node);
+      pushUndo(function() {
+        nodeList.pop();
+      });
+    }
+  } else {
+    node = nodes[data.prevId];
+    var oldLabel = node.label;
+    var oldInvalidated = node.invalidated;
+    delete nodes[data.prevId];
+    nodes[data.id] = node;
+    node.label = data.label;
+    node.invalidated = false;
+    pushUndo(function() {
+      node.label = oldLabel;
+      node.invalidated = oldInvalidated;
+      delete nodes[data.id];
+      nodes[data.prevId] = node;
+    });
+  }
+}
+
+Array.prototype.pushWithUndo = function(value) {
+  var self = this;
+  this.push(value);
+  pushUndo(function() {
+    self.pop();
+  });
+}
+
+Array.prototype.shiftWithUndo = function(value) {
+  var self = this;
+  var value = this.shift();
+  pushUndo(function() {
+    self.unshift(value);
+  });
+  return value;
+}
+
+var undoStack = [];
+var currentUndos = null;
+function startUndoScope() {
+  if (currentUndos !== null)
+    throw new Error('Illegal state');
+  currentUndos = [];
+}
+function pushUndo(func) {
+  currentUndos.push(func);
+}
+function endUndoScope() {
+  var localUndos = currentUndos;
+  undoStack.push(function() {
+    while (localUndos.length) {
+      localUndos.pop()();
+    }
+  });
+  currentUndos = null;
+}
+function undo() {
+  if (undoStack.length) {
+    undoStack.pop()();
+    update();
+    return true;
+  }
+  return false;
+}
+function undoAll() {
+  while (undo()) {}
+}
+
+// Here we monkeypatch Math.random to take part in the undo mechanism.
+// This allows "random" d3 force-layout decisions to be reproducible.
+// If we don't do this, then doing/undoing/redoing a node creation step
+// looks very confusing, as the node comes flying in from a different
+// direction each time.
+var trueRandom = Math.random;
+Math.random = (function() {
+  var randomStack = [];
+  return function() {
+    if (!currentUndos)
+      return trueRandom();
+
+    var value;
+    if (randomStack.length > 0) {
+      value = randomStack.pop();
+    }
+    else {
+      value = trueRandom();
+    }
+    pushUndo(function() {
+      randomStack.push(value);
+    });
+    return value;
+  };
+})();
+
+var callbacks = {
+  ctx: function(data) {
+    createNodeWithUndo(data);
+    return true;
+  },
+  dep: function(data) {
+    var dependsOn = nodes[data.dependsOn];
+    if (!dependsOn) {
+      createNodeWithUndo({
+        id: data.dependsOn,
+        label: data.dependsOn,
+        type: 'value'
+      });
+      dependsOn = nodes[data.dependsOn];
+    }
+    if (dependsOn.hide) {
+      dependsOn.hide = false;
+      nodeList.push(dependsOn);
+      pushUndo(function() {
+        dependsOn.hide = true;
+        nodeList.pop();
+      });
+    }
+    links.push({
+      source: nodes[data.id],
+      target: nodes[data.dependsOn]
+    });
+    pushUndo(function() {
+      links.pop();
+    });
+  },
+  depId: function(data) {
+    links.push({
+      source: nodes[data.id],
+      target: nodes[data.dependsOn]
+    });
+    pushUndo(function() {
+      links.pop();
+    });
+  },
+  invalidate: function(data) {
+    var node = nodes[data.id];
+    if (node.invalidated)
+      throw new Error('Illegal sequence');
+
+    node.invalidated = true;
+    pushUndo(function() {
+      node.invalidated = false;
+    });
+
+    var origLinks = links;
+    links = links.filter(function(link) {
+      return link.source !== node;
+    });
+    pushUndo(function() {
+      links = origLinks;
+    });
+  },
+  valueChange: function(data) {
+    var existed = !!nodes[data.id];
+    createNodeWithUndo({
+      id: data.id,
+      label: data.id + ' = ' + data.value,
+      type: 'value',
+      prevId: nodes[data.id] ? data.id : null,
+      hide: existed ? nodes[data.id].hide : true
+    });
+    if (!existed || nodes[data.id].hide)
+      return true;
+    nodes[data.id].changed = true;
+    pushUndo(function() {
+      nodes[data.id].changed = false;
+    });
+    executeBeforeNextCommand.pushWithUndo(function() {
+      nodes[data.id].changed = false;
+      pushUndo(function() {
+        nodes[data.id].changed = true;
+      });
+    });
+  },
+  enter: function(data) {
+    var node = nodes[data.id];
+    node.running = true;
+    node.start = data.time;
+    var oldTimeElapsed = node.timeElapsed;
+    node.timeElapsed = null;
+    pushUndo(function() {
+      node.running = false;
+      node.start = null;
+      node.timeElapsed = oldTimeElapsed;
+    });
+  },
+  exit: function(data) {
+    var node = nodes[data.id];
+    node.running = false;
+    var oldTimeElapsed = node.timeElapsed;
+    node.timeElapsed = time ? (parseFloat(data.time) - parseFloat(node.start)) * 1000 : null;
+    pushUndo(function() {
+      node.running = true;
+      node.timeElapsed = oldTimeElapsed;
+    });
+  }
+};
+
+function processMessage(data, suppressUpdate) {
+  if (!callbacks.hasOwnProperty(data.action))
+    throw new Error('Unknown action ' + data.action);
+  var result = callbacks[data.action].call(callbacks, data);
+  if (!suppressUpdate)
+    update();
+  return result;
+}
+
+var executeBeforeNextCommand = [];
+function doNext(suppressUpdate) {
+  if (!log.length)
+    return;
+
+  startUndoScope();
+  while (executeBeforeNextCommand.length) {
+    executeBeforeNextCommand.shiftWithUndo()();
+  }
+  while (log.length) {
+    var result = (function() {
+      var message = log.shift();
+      pushUndo(function() {
+        log.unshift(message);
+      })
+      return processMessage(message, suppressUpdate);
+    })();
+    if (!result)
+      break;
+  }
+  if (!log.length) {
+    $('#ended').fadeIn(1500);
+    pushUndo(function() {
+      $('#ended').hide();
+    });
+  }
+  step++;
+  updateTimeline();
+  pushUndo(function() {
+    step--;
+    updateTimeline();
+  });
+  endUndoScope();
+}
+
+function countSteps() {
+  if (undoStack.length !== 0) {
+    throw new Error(
+      'Illegal state; must call countSteps before execution begins');
+  }
+  var steps = 0;
+  while (log.length) {
+    doNext();
+    steps++;
+  }
+  while (undoStack.length)
+    undoStack.pop()();
+  return steps;
+}
+
+function updateTimeline() {
+  $('#timeline-fill').width((step/totalSteps*100) + '%');
+}
+
+function zoom() {
+  var scale = d3.event.scale;
+  var x = d3.event.translate[0];
+  var y = d3.event.translate[1];
+  d3.select('#viz').attr('transform', 'scale(' + scale + ') translate(' + x/scale + ' ' + y/scale + ')');
+}
+
+// The total number of steps, as far as the user is concerned, in the log.
+// This may/will be different than the number of log entries, since each
+// step may include more than one log entry.
+var totalSteps;
+// The current step we're on.
+var step;
+$(function() {
+  d3.select('svg').call(d3.behavior.zoom().scale(4).on('zoom', zoom));
+  $(document.body).on('keydown', function(e) {
+    if (e.which === 39 || e.which === 32) { // space, right
+      // Move one step ahead
+      doNext();
+    }
+    if (e.which === 37) { // left
+      // Move one step back
+      undo();
+    }
+    if (e.which === 35) { // end
+      // Seek to end
+      while (log.length) {
+        doNext();
+      }
+    }
+    if (e.which === 36) { // home
+      // Seek to beginning
+      undoAll();
+    }
+  });
+
+  // Timeline click and scrub
+  $('#timeline').on('click mousemove', function(e) {
+    // Make sure left mouse button is down.
+    // Firefox is stupid; e.which is always 1 on mousemove events,
+    // even when button is not down!! So read e.originalEvent.buttons.
+    if (typeof(e.originalEvent.buttons) !== 'undefined') {
+      if (e.originalEvent.buttons !== 1)
+        return;
+    } else if (e.which !== 1) {
+      return;
+    }
+
+    var timeline = e.currentTarget;
+    var pos = e.offsetX || e.originalEvent.layerX;
+    var width = timeline.offsetWidth;
+    var targetStep = Math.round((pos/width) * totalSteps);
+    while (step < targetStep) {
+      doNext();
+    }
+    while (step > targetStep && step != 1) {
+      undo();
+    }
+  });
+
+  totalSteps = countSteps();
+  step = 0;
+
+  doNext();
+
+  // don't allow undoing past initial state
+  while (undoStack.length)
+    undoStack.pop();
+  executeBeforeNextCommand.push(function() {
+    $('#instructions').fadeOut(1000);
+    // It's weird for the instructions to fade back in, so no pushUndo here
+  });
+});
+</script>
+<body>
+  <svg>
+    <defs>
+      <marker id="triangle"
+              viewBox="0 0 10 10"
+              refX="5" refY="5"
+              markerWidth="6"
+              markerHeight="6"
+              orient="auto">
+          <path d="M 10 0 L 0 5 L 10 10 z" />
+      </marker>
+      <pattern id="diagonalHatch" patternUnits="userSpaceOnUse" width="1" height="1">
+        <path stroke="black" stroke-width="0.25" fill="none"
+          d="M-1,1 l2,-2
+             M0,4 l4,-4
+             M3,5 l2,-2" />
+      </pattern>
+    </defs>
+    <g id="viz" transform="scale(4)">
+      <g id="links"></g>
+      <g id="nodes"></g>
+    </g>
+  </svg>
+  <div id="instructions">
+    Press right-arrow to advance
+  </div>
+  <div id="ended" style="display: none;">
+    <strong>You&rsquo;ve reached the end</strong><br/>Press the Home key to start over
+  </div>
+  <div id="legend">
+    <div class="color normal"></div> Normal<br/>
+    <div class="color invalidated"></div> Invalidated<br/>
+    <div class="color running"></div> Running<br/>
+  </div>
+  <br/>
+  <pre id="description"><br/></pre>
+  <div id="timeline">
+    <div id="timeline-bg">
+      <div id="timeline-fill"></div>
+    </div>
+  </div>
+</body>
+</html>

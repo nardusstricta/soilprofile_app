@@ -1,3 +1,4 @@
+#Photo import Modul
 photoUI <- function(id) {
   ns <- NS(id)
   uiOutput(ns("ui_photo"))
@@ -13,7 +14,7 @@ photoMod <- function(input, output, session, pvars, global_df) {
                            choices = c("", as.character(global_df()$nameC)), selectize = FALSE), 
                actionButton(session$ns("save_photo"), "add Photo to plot")
              ),
-             actionButton("rmphoto", "remove Photo")
+             actionButton(session$ns("rmphoto"), "remove Photo")
       )
     }
   })
@@ -36,12 +37,12 @@ photoMod <- function(input, output, session, pvars, global_df) {
     test <- png_import(userPhoto()$datapath, 
                        global_df()[which(global_df()$nameC == as.character(input$horizont_name)),],
                                     raster2polygon = F)
-    raster_list$data <- ggspatial::layer_spatial(test)
-    #print(test)
-    #raster_list$data <- list(raster_list$data, test)
+    raster_list$data <- list(ggspatial::layer_spatial(test), raster_list$data)
   })
+  
   observeEvent(input$rmphoto, {
-    raster_list$data <<- NULL 
+    raster_list$data <- NULL
+    raster_list <<- reactiveValues(data = NULL)
   })
   
   erg_photo <- reactive({
